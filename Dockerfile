@@ -91,3 +91,15 @@ COPY --chown=imas scripts/wrapper.sh wrapper.sh
 RUN chmod +x wrapper.sh
 
 CMD /opt/run.sh
+
+
+# Install imas-inotify and dependencies
+RUN git clone https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify \
+    && sudo pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
+
+# Enable imas-inotify service
+COPY init.d/imas-inotify /etc/init.d/imas-inotify
+RUN sudo update-rc.d imas-inotify defaults
+
+# Configure imas-inotify
+COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py

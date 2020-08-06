@@ -31,6 +31,7 @@ EOF
 sudo /etc/init.d/mysql start
 sudo /etc/init.d/catalogqt start
 sudo /etc/init.d/updateprocess start
+sudo /etc/init.d/imas-inotify start
 
 /bin/bash
 
