@@ -9,7 +9,7 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir="/home/imas/opt/catalog_qt_2/ws/catalog-ws"
+dir="/home/imas/opt/catalog_qt_2/server/catalog-ws-server"
 cmd="mvn spring-boot:run"
 user="imas"
 
