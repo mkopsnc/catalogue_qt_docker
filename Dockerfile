@@ -65,11 +65,26 @@ COPY external/catalog_qt_2.tar /home/imas/opt/catalog_qt_2.tar
 WORKDIR /home/imas/opt
 RUN tar xf catalog_qt_2.tar
 
+# We have to build commons project so we can use it inside server and client parts
+WORKDIR /home/imas/opt/catalog_qt_2/common/catalog-ws-common
+RUN mvn package
+
 # We can build JAR file for client application
 WORKDIR /home/imas/opt/catalog_qt_2/client/catalog-ws-client
+
+# Local repo will contain two JAR files: imas and common
 RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
 RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/imas/core/IMAS/3.28.1-4.8.1/jar/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
+RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/opt/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
+
+# Finally, we can build client
 RUN mvn install -DskipTests
+
+# The same goes for server. We have to make sure that common is loaded inside server's local directory
+WORKDIR /home/imas/opt/catalog_qt_2/server/catalog-ws-server
+RUN mkdir -p /home/imas/opt/catalog_qt_2/server/catalog-ws-server/local-maven-repo
+RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/opt/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
+RUN mvn compile -DskipTests
 
 USER root
 
@@ -87,8 +102,8 @@ USER imas
 
 # Wrapper script is a convenient way of setting up IMAS env. variables and
 # running update process
-COPY --chown=imas scripts/wrapper.sh wrapper.sh
-RUN chmod +x wrapper.sh
+COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
+RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 
 CMD /opt/run.sh
 

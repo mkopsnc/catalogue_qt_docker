@@ -9,7 +9,7 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 ```
 > git clone https://github.com/mkopsnc/catalog_qt_docker.git
 > cd catalog-qt-docker
-> git checkout develop
+> git checkout master
 ```
 
 Before you start building the container, make sure to prepare sources of `Catalogue QT 2`
