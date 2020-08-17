@@ -17,7 +17,7 @@ Before you start building the container, make sure to prepare sources of `Catalo
 ```
 > git clone https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2
 > cd catalog_qt_2
-> git checkout --track origin/master
+> git checkout --track origin/develop
 > cd ..
 > tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
