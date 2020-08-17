@@ -42,6 +42,12 @@ once inside, you are "logged in" as user `imas`. All `Catalogue QT` related serv
 > docker run -i -t -p 8080:8080 catalogqt
 ```
 
+# Starting container and giving access to MySQL
+
+```
+> docker run -i -t -p 8080:8080 -p 3306:3306 -p 33060:33060 --name catalogqt_test catalogqt
+```
+
 Once container is started you can navigate to: [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 # Importing data from pulse file
