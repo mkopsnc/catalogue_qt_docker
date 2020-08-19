@@ -7,8 +7,8 @@ This container is desined to simplify installation of Catalogue QT and it's comp
 This container requires `imas/fc2k` Docker image. Before you proceed, make sure to install it on your system. You can follow instructions here: [Installing IMAS Docker](https://docs.psnc.pl/display/WFMS/IMAS+@+Docker). Once you have it installed on your system, you can create `Catalogue QT Docker`.
 
 ```
-> git clone https://github.com/mkopsnc/catalog_qt_docker.git
-> cd catalog_qt_docker
+> git clone https://github.com/mkopsnc/catalogue_qt_docker.git
+> cd catalogue_qt_docker
 > git checkout --track origin/master
 ```
 
