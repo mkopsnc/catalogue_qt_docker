@@ -88,17 +88,24 @@ RUN mvn compile -DskipTests
 
 USER root
 
+# XLST - transformation file that generates SQL queries for variables is located here:
+# /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl
+
+RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl $IMAS_PREFIX/include/IDSDef.xml > /tmp/variables
+
 # We have to prepare database for Catalog QT.
-# Schema is located here: catalog_qt_2/sql/schema/catalog_qt_db.sql
+# Schema is located here: /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql
 RUN echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" > /tmp/config && \
     echo "/usr/local/mysql/bin/mysqladmin -uroot -ppassword --silent --wait=30 ping || exit 1" >> /tmp/config && \
     echo "/usr/local/mysql/bin/mysql -uroot -ppassword < /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql" >> /tmp/config && \
+    echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < /tmp/variables" >> /tmp/config && \
     echo "/usr/local/mysql/bin/mysqladmin shutdown -u root -ppassword --wait=30 ping || exit 1" >> /tmp/config && \
     bash /tmp/config && \
     rm -f /tmp/config
 
-USER imas
+# This part of Docker file is responsible for setting up services (UpdateProcess and notify service)
 
+USER imas
 
 # Wrapper script is a convenient way of setting up IMAS env. variables and
 # running update process
