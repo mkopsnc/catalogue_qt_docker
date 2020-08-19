@@ -14,10 +14,7 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 Before you start building the container, make sure to prepare sources of `Catalogue QT 2`
 
 ```
-> git clone https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2
-> cd catalog_qt_2
-> git checkout --track origin/develop
-> cd ..
+> git clone --single-branch --branch develop https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
 > tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
 
@@ -32,16 +29,16 @@ Once project is in place, you can build the container.
 Starting the container is quite simple, all you have to do is to run
 
 ```
-> docker run -i -t catalogqt
+> docker run -i -t --name catalogqt_test catalogqt
 ```
 
 once inside, you are "logged in" as user `imas`. All `Catalogue QT` related services are started automatically. If you want to access `Catalog QT WS API` from the outside of the container, you can expose it's ports:
 
 ```
-> docker run -i -t -p 8080:8080 catalogqt
+> docker run -i -t -p 8080:8080 --name catalogqt_test catalogqt
 ```
 
-# Starting container and giving access to MySQL
+# Starting container and forwarding MySQL ports
 
 ```
 > docker run -i -t -p 8080:8080 -p 3306:3306 -p 33060:33060 --name catalogqt_test catalogqt
