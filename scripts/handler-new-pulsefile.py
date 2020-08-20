@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import json
+import logging
 import os
 import re
 import subprocess
@@ -25,20 +26,35 @@ def parse_path(core: str) -> Tuple[str, str, str, int, int]:
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+
     if len(sys.argv) == 2:
         core, extension = os.path.splitext(sys.argv[1])
 
         # process data only if the extension is .populate
         if extension == '.populate':
             user, tokamak, version, shot, run = parse_path(core)
+            logging.info(
+                f'Inferred settings from {sys.argv[1]} filer: '
+                f'user={user} tokamak={tokamak} version={version} shot={shot} run={run}')
 
             # try to parse contents of .populate file as JSON data
-            with open(sys.argv[1]) as infile:
-                content = infile.read()
-                data = json.loads(content if content.strip() else '{}')
+            try:
+                with open(sys.argv[1]) as infile:
+                    content = infile.read()
+                    data = json.loads(content if content.strip() else '{}')
+                logging.debug(f'Loaded content of {sys.argv[1]} file:\n{json.dumps(data, indent=4, sort_keys=True)}')
+            except:
+                data = dict()
+                logging.warning(f'Failed to load the content of {sys.argv[1]} file as JSON data')
 
             # add additional experiment URI params read from .populate JSON here
-            occurrence = f';occurrence={data["occurrence"]}' if 'occurrence' in data else ''
+            if 'occurrence' in data:
+                occurrence = f';occurrence={data["occurrence"]}'
+                logging.info(f'Found occurrence setting: {data["occurrence"]}')
+            else:
+                occurrence = ''
+                logging.info('Did not find occurrence setting, using default value')
 
             command = ['java',
                        '-jar',
@@ -50,5 +66,5 @@ if __name__ == '__main__':
                        'http://localhost:8080',
                        '--experiment-uri',
                        f'mdsplus:/?user={user};machine={tokamak};version={version};shot={shot};run={run}{occurrence}']
-            print('Executing command: {}'.format(' '.join(command)))
+            logging.info(f'Executing command: {" ".join(command)}')
             subprocess.run(command)
