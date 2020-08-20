@@ -91,7 +91,7 @@ USER root
 # XLST - transformation file that generates SQL queries for variables is located here:
 # /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl
 
-RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl $IMAS_PREFIX/include/IDSDef.xml > /tmp/variables
+RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFields.xsl $IMAS_PREFIX/include/IDSDef.xml > /tmp/variables
 
 # We have to prepare database for Catalog QT.
 # Schema is located here: /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql
