@@ -30,4 +30,8 @@ while [ $loop == 1 ]; do
 
 done
 
-java -jar target/catalogAPI.jar -startUpdateProcess --url http://127.0.0.1:8080 --slice-limit 100
+java -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
+  -startUpdateProcess \
+  --url http://127.0.0.1:8080 \
+  --scheme mdsplus \
+  --slice-limit 100
