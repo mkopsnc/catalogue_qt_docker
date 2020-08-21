@@ -125,3 +125,24 @@ RUN sudo update-rc.d imas-inotify defaults
 
 # Configure imas-inotify
 COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
+
+# Setting up Demonstrator Dashboard
+# Making space for webapp
+COPY --chown=imas:imas external/demonstrator-dashboard.tar /home/imas/opt/
+WORKDIR /home/imas/opt/
+RUN tar xf demonstrator-dashboard.tar
+
+# Install requirements
+RUN python3 -m pip install -r demonstrator-dashboard/requirements.txt
+
+COPY --chown=imas:imas scripts/dashboard-wrapper.sh /home/imas/opt/demonstrator-dashboard/dashboard-wrapper.sh
+RUN chmod +x /home/imas/opt/demonstrator-dashboard/dashboard-wrapper.sh
+
+
+# Enable dashboard service
+USER root
+COPY init.d/dashboard /etc/init.d/dashboard
+RUN chmod +x /etc/init.d/dashboard
+RUN update-rc.d dashboard defaults
+
+USER imas
