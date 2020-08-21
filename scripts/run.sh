@@ -4,26 +4,34 @@ cd $HOME
 
 cat << EOF
       ****************************************************
-          https://github.com/mkopsnc/Catalog-QT-Docker
+         https://github.com/mkopsnc/catalogue_qt_docker
       ****************************************************
         This Docker container provides functionality
         of IMAS based Catalog QT service.
         ------------------------------------------------
         
-        Once started, you can browse:
+        Once started, you can visit:
 
         http://localhost:8080/swagger-ui.html
 
-        for API.
+        to browse description of RESTful API.
 
-        You can also use Catalog QT client application
+        You can also visit
+
+        http://localhost:8082
+
+        to browse Demonstrator Dashboard.
+
+        You can also use Catalog QT CLI application
         to perform calls to the API.
 
-        By default, this container starts three services
+        By default, this container starts five services
         
         - MySQL
         - Catalog QT WS
         - Catalog QT Update Process
+        - Demonstrator Dashboard
+        - inotify based trigger for data imports
  
         ------------------------------------------------
 EOF
