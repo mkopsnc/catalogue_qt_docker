@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/home/imas/opt/demonstrator-dashboard"
-cmd="python3 manage.py runserver 0.0.0.0:8082"
+cmd="sh dashboard-wrapper.sh"
 user="imas"
 
 name=`basename $0`

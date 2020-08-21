@@ -135,11 +135,14 @@ RUN tar xf demonstrator-dashboard.tar
 # Install requirements
 RUN python3 -m pip install -r demonstrator-dashboard/requirements.txt
 
-# Enable imas-inotify service
-COPY init.d/dashboard /etc/init.d/dashboard
-RUN sudo update-rc.d dashboard defaults
+COPY --chown=imas:imas scripts/dashboard-wrapper.sh /home/imas/opt/demonstrator-dashboard/dashboard-wrapper.sh
+RUN chmod +x /home/imas/opt/demonstrator-dashboard/dashboard-wrapper.sh
 
-# Avoiding to change webapp code
+
+# Enable dashboard service
 USER root
-RUN echo "catalog.eufus.eu    127.0.0.1" >> /etc/hosts
+COPY init.d/dashboard /etc/init.d/dashboard
+RUN chmod +x /etc/init.d/dashboard
+RUN update-rc.d dashboard defaults
+
 USER imas
