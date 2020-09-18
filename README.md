@@ -75,8 +75,47 @@ Once container is started you can navigate to:
 
 # Importing data from pulse file
 
-TBD
+Catalog QT Demonstrator allows to import MDSPlus based data automatically into database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. You can do it with `-v` option.
+
+First of all, make sure you have `MDSPlus` like directory structure with pulse files.
+
+```
+imasdb
+`-- test
+    `-- 3
+        |-- 0
+        |   |-- ids_10001.characteristics
+        |   |-- ids_10001.datafile
+        |   `-- ids_10001.tree
+        |-- 1
+        |-- 2
+        |-- 3
+        |-- 4
+        |-- 5
+        |-- 6
+        |-- 7
+        |-- 8
+        `-- 9
+```
+
+Once you have it, you can run Docker container following way
+
+```
+> docker run -i -p 8080:8080 \
+  -p 8082:8082 \
+  -p 3306:3306 \
+  -p 33060:33060 \
+  --add-host=catalog.eufus.eu:127.0.0.1 \
+  -v `pwd`/imasdb:/home/imas/public/imasdb \
+  --name catalogqt_test -t catalogqt
+```
+
+This way, you are bind mount your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension.
+
+```
+> touch imasdb/test/3/0/ids_10001.populate
+````
 
 # Known limitations
 
-Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 source repository.
+Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Demonstrator Dashboard source repositories.
