@@ -16,7 +16,7 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 ## Make sure to prepare sources of `Catalogue QT 2`
 
 ```
-> git clone --single-branch --branch develop https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+> git clone --single-branch --branch v1.3 https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
 > tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
 
