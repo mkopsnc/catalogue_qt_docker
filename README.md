@@ -23,7 +23,7 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 ## Make sure to prepare source of `Demonstrator Dashboard`
 
 ```
-> git clone --single-branch --branch api_calls https://gitlab.com/fair-for-fusion/demonstrator-dashboard
+> git clone --single-branch --branch v1.3 https://gitlab.com/fair-for-fusion/demonstrator-dashboard
 > tar cf external/demonstrator-dashboard.tar ./demonstrator-dashboard
 ```
 
