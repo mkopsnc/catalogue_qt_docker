@@ -18,9 +18,10 @@ while [ $loop == 1 ]; do
 
   if [ $retVal -ne 0 ]; then
     sleep 10
+    echo "Starting Update Process - failed to connect to Catalog QT server. Trying again in 10 seconds."
     tries=$((tries-1))
     if [ $tries == 0 ]; then
-      echo "Failed to connect to Catalog QT server"
+      echo "Starting Update Process - failed to connect to Catalog QT server. Quiting after 10 retries."
       exit 1
     fi
   else

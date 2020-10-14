@@ -107,6 +107,7 @@ Once you have it, you can run Docker container following way
   -p 33060:33060 \
   --add-host=catalog.eufus.eu:127.0.0.1 \
   -v `pwd`/imasdb:/home/imas/public/imasdb \
+  -v `pwd`/mysql_storage:/usr/local/mysql/mysql_storage \
   --name catalogqt_test -t catalogqt
 ```
 
