@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+    image: catalogqt/db
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+
+  server:
+    image: catalogqt/server
+    ports:
+      - 8080:8080
+
+  updateprocess:
+    image: catalogqt/updateprocess
+
+  inotify:
+    image: catalogqt/inotify
