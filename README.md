@@ -46,7 +46,7 @@ In case you want to build development version of `Catalog QT - Docker` you have 
 ```
 
 ```
-> git clone --single-branch --branch pcss/develop https://gitlab.com/fair-for-fusion/demonstrator-dashboard
+> git clone --single-branch --branch psnc/develop https://gitlab.com/fair-for-fusion/demonstrator-dashboard
 > tar cf external/demonstrator-dashboard.tar ./demonstrator-dashboard
 ```
 
