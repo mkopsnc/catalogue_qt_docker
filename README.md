@@ -31,6 +31,8 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 
 # Building development version of Docker
 
+> Note that this section is for people who work with development release of Catalog QT - Docker
+
 In case you want to build development version of `Catalog QT - Docker` you have to use following branches
 
 ```
