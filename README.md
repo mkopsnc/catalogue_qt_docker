@@ -60,6 +60,12 @@ By default, Demonstrator Dashboard ports are not exposed. If you want to access 
 > docker run -i -p 8080:8080 -p 8082:8082 --add-host=catalog.eufus.eu:127.0.0.1 --name catalogqt_test -t catalogqt
 ```
 
+Also you want to add this line in your `/etc/hosts` file
+
+```
+> echo "127.0.0.1     catalog.eufus.eu" | sudo tee -a /etc/hosts
+```
+
 ## Exposing MySQL ports
 
 For development purposes it might be useful to access data directly inside MySQL instance. You can do it following way
@@ -71,7 +77,7 @@ For development purposes it might be useful to access data directly inside MySQL
 Once container is started you can navigate to:
 
 - [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
-- [localhost:8082](http://localhost:8082) to access Demonstrator Dashboard
+- [catalog.eufus.eu:8082](http://catalog.eufus.eu:8082) to access Demonstrator Dashboard
 
 # Importing data from pulse file
 
