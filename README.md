@@ -75,7 +75,13 @@ Also you want to add this line in your `/etc/hosts` file
 For development purposes it might be useful to access data directly inside MySQL instance. You can do it following way
 
 ```
-> docker run -i -p 8080:8080 -p 8082:8082 -p 3306:3306 -p 33060:33060 --add-host=catalog.eufus.eu:127.0.0.1 --name catalogqt_test -t catalogqt
+> docker run -i \
+  -p 8080:8080 \
+  -p 8082:8082 \
+  -p 3306:3306 \
+  -p 33060:33060 \
+  --add-host=catalog.eufus.eu:127.0.0.1 \
+  --name catalogqt_test -t catalogqt
 ```
 
 Once container is started you can navigate to:
