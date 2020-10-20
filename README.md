@@ -148,7 +148,6 @@ Once you have it, you can run Docker container following way
   -p 33060:33060 \
   --add-host=catalog.eufus.eu:127.0.0.1 \
   -v `pwd`/imasdb:/home/imas/public/imasdb \
-  -v `pwd`/mysql_storage:/usr/local/mysql/mysql_storage \
   --name catalogqt_test -t catalogqt
 ```
 
@@ -157,6 +156,25 @@ This way, you are bind mount your local filesystem inside Docker container. Once
 ```
 > touch imasdb/test/3/0/ids_10001.populate
 ````
+
+# Setting up external volume for MySQL data
+
+In case of large data sets you might be interested in storing data outside Docker container. It is possible by attaching your local directory to `/usr/local/mysql/mysql_storage`
+
+> Note that this is a subject to change in the future. Location was choosen arbitraly and may change in the future. It doesn't matter where your local files will be stored, you can choose any location you like
+
+Once you have a place for local data storage you can run Docker following way
+
+```
+> docker run -i -p 8080:8080 \
+  -p 8082:8082 \
+  -p 3306:3306 \
+  -p 33060:33060 \
+  --add-host=catalog.eufus.eu:127.0.0.1 \
+  -v `pwd`/imasdb:/home/imas/public/imasdb \
+  -v `pwd`/mysql_storage:/usr/local/mysql/mysql_storage \
+  --name catalogqt_test -t catalogqt
+```
 
 # Known limitations
 
