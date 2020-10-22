@@ -7,7 +7,8 @@ This container is desined to simplify installation of Catalogue QT and it's comp
 This container requires `imas/fc2k` Docker image. Before you proceed, make sure to install it on your system. You can follow instructions here: [Installing IMAS Docker](https://docs.psnc.pl/display/WFMS/IMAS+@+Docker). Once you have it installed on your system, you can create `Catalogue QT Docker`.
 
 ```
-> git clone --single-branch --branch v1.3 https://github.com/mkopsnc/catalogue_qt_docker.git
+> git clone --single-branch --branch v1.3 \
+  https://github.com/mkopsnc/catalogue_qt_docker.git
 > cd catalogue_qt_docker
 ```
 
@@ -16,14 +17,16 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 ## Make sure to prepare sources of `Catalogue QT 2`
 
 ```
-> git clone --single-branch --branch v1.3 https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+> git clone --single-branch --branch v1.3 \
+  https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
 > tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
 
 ## Make sure to prepare source of `Demonstrator Dashboard`
 
 ```
-> git clone --single-branch --branch v1.3 https://gitlab.com/fair-for-fusion/demonstrator-dashboard
+> git clone --single-branch --branch v1.3 \
+  https://gitlab.com/fair-for-fusion/demonstrator-dashboard
 > tar cf external/demonstrator-dashboard.tar ./demonstrator-dashboard
 ```
 
@@ -36,17 +39,20 @@ This container requires `imas/fc2k` Docker image. Before you proceed, make sure 
 In case you want to build development version of `Catalog QT - Docker` you have to use following branches
 
 ```
-> git clone --single-branch --branch master https://github.com/mkopsnc/catalogue_qt_docker.git
+> git clone --single-branch --branch master \
+  https://github.com/mkopsnc/catalogue_qt_docker.git
 > cd catalogue_qt_docker
 ```
 
 ```
-> git clone --single-branch --branch develop https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+> git clone --single-branch --branch develop \
+  https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
 > tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
 
 ```
-> git clone --single-branch --branch psnc/develop https://gitlab.com/fair-for-fusion/demonstrator-dashboard
+> git clone --single-branch --branch psnc/develop \
+  https://gitlab.com/fair-for-fusion/demonstrator-dashboard
 > tar cf external/demonstrator-dashboard.tar ./demonstrator-dashboard
 ```
 
