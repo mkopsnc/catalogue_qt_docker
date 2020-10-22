@@ -130,6 +130,7 @@ COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pu
 COPY --chown=imas:imas external/demonstrator-dashboard.tar /home/imas/opt/
 WORKDIR /home/imas/opt/
 RUN tar xf demonstrator-dashboard.tar
+COPY --chown=imas:imas external/dashboard-secrets.json /home/imas/opt/demonstrator-dashboard/dashboard/settings/secrets.json
 
 # Install requirements
 RUN python3 -m pip install -r demonstrator-dashboard/requirements.txt
