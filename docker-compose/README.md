@@ -4,6 +4,7 @@ Be prepared to:
 
 - Login into `rhus-71.man.poznan.pl` Docker registry
 - Login into `gforge6.eufus.eu` project named `catalog_qt_2`
+- Login into `gitlab.com` project named `fair-for-fusion/demonstrator-dashboard`
 
 ```
 cd build
@@ -55,3 +56,5 @@ docker-compose up
     If you want to change `server` container name in `docker-compose.yml`, then edit `build/files/updateprocess.sh` and rebuild `catalogqt/updateprocess` image.
 
 -   Container `inotify` connects to `server`. The connection URL is configurable in the `config.ini` file of `tzok/imas-inotify` project. Currently, the file in `master` branch has a valid URL. If you want to change `server` container name in `docker-compose.yml`, then (1) create a copy of `config.ini` from `tzok/imas-inotify`, (2) change its `url` line, (3) add `COPY` instruction to Dockerfile's part related to `catalogqt/inotify` and (4) rebuild this image.
+
+-   Container `dashboard` connects to `server` The connection URL is set in `demonstrator-dashboard/db_api/services.py` in line starting with `API_ROOT = `. This line is changed by `sed` in the Dockerfile

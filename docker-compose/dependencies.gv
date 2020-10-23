@@ -3,8 +3,10 @@ digraph G {
     server
     updateprocess
     inotify
+    dashboard
 
-    inotify -> server;
-    updateprocess -> server;
-    server -> db;
+    updateprocess -> server
+    inotify -> server
+    dashboard -> server
+    server -> db
 }
