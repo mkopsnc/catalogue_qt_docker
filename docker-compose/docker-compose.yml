@@ -6,13 +6,24 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=1
 
+  dashboard:
+    image: catalogqt/dashboard
+    ports:
+      - 8082:8082
+
   server:
     image: catalogqt/server
     ports:
       - 8080:8080
+    volumes:
+      - imasdb:/home/imas/public/imasdb
 
   updateprocess:
     image: catalogqt/updateprocess
+    volumes:
+      - imasdb:/home/imas/public/imasdb
 
   inotify:
     image: catalogqt/inotify
+    volumes:
+      - imasdb:/home/imas/public/imasdb

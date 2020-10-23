@@ -23,9 +23,12 @@ RUN apt-get update -y && \
 COPY catalog_qt_2 /catalog_qt_2
 
 RUN sh -c 'cd /catalog_qt_2/common/catalog-ws-common; mvn install -DskipTests' && \
-    mvn install:install-file -Dfile=/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=pl.psnc.catalog -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
+    mvn install:install-file -Dfile=/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
     cp /opt/imas/core/IMAS/*/jar/imas.jar /tmp/imas.jar && \
     mvn install:install-file -Dfile=/tmp/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar
+
+RUN useradd --create-home --shell /bin/bash imas && \
+    su - imas sh -c 'MODULEPATH=/opt/imas/etc/modulefiles module load IMAS; mkdir -p /home/imas/public/imasdb; command imasdb test'
 
 ################################################################################
 
@@ -56,7 +59,23 @@ CMD /server.sh
 
 FROM client AS inotify
 
-RUN git clone https://github.com/tzok/imas-inotify.git && \
+COPY files/config.ini /config.ini
+COPY files/inotify.sh /inotify.sh
+
+RUN git clone -b develop https://github.com/tzok/imas-inotify.git && \
     pip3 install -r imas-inotify/requirements.txt
 
-CMD imas-inotify/imas-inotify.py --verbose
+CMD /inotify.sh
+
+################################################################################
+
+FROM python AS dashboard
+
+COPY demonstrator-dashboard /demonstrator-dashboard
+COPY files/dashboard-secrets.json /demonstrator-dashboard/dashboard/settings/secrets.json
+COPY files/dashboard.sh /dashboard.sh
+
+RUN pip install -r /demonstrator-dashboard/requirements.txt && \
+    sed -i '/API_ROOT =/ a API_ROOT = "http://server:8080/"' /demonstrator-dashboard/db_api/services.py
+
+CMD /dashboard.sh

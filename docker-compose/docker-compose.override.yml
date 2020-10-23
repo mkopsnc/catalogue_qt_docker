@@ -1,10 +1,14 @@
 version: "3.8"
 
 services:
-  db:
+  server:
     volumes:
-      - ./db-data:/var/lib/mysql
+      - ./imasdb:/home/imas/public/imasdb
+
+  updateprocess:
+    volumes:
+      - ./imasdb:/home/imas/public/imasdb
 
   inotify:
     volumes:
-      - ./imasdb:/mnt/imasdb
+      - ./imasdb:/home/imas/public/imasdb
