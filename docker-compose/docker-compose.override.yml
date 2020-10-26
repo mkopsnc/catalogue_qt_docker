@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  server:
+    volumes:
+      - ./imasdb:/home/imas/public/imasdb
+
+  updateprocess:
+    volumes:
+      - ./imasdb:/home/imas/public/imasdb
+
+  inotify:
+    volumes:
+      - ./imasdb:/home/imas/public/imasdb
