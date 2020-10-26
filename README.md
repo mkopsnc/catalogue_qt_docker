@@ -72,6 +72,12 @@ Once both projects are in place, you can build the container.
 > docker build -t catalogqt .
 ```
 
+Please note that for tagged release you have to specify tag of the `imas-notify` project. You can do it following way
+
+```
+> docker build -t catalogqt --build-arg INOTIFY_TAG=0.4 .
+```
+
 # Starting container
 
 Starting the container is quite simple, all you have to do is to run
@@ -101,12 +107,6 @@ By default, Demonstrator Dashboard ports are not exposed. If you want to access 
   --name catalogqt_test -t catalogqt
 ```
 
-Also you want to add this line in your `/etc/hosts` file
-
-```
-> echo "127.0.0.1     catalog.eufus.eu" | sudo tee -a /etc/hosts
-```
-
 ## Exposing MySQL ports
 
 For development purposes it might be useful to access data directly inside MySQL instance. You can do it following way
@@ -124,7 +124,7 @@ For development purposes it might be useful to access data directly inside MySQL
 Once container is started you can navigate to:
 
 - [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
-- [catalog.eufus.eu:8082](http://catalog.eufus.eu:8082) to access Demonstrator Dashboard
+- [localhost:8082](http://localhost:8082) to access Demonstrator Dashboard
 
 # Importing data from pulse file
 
@@ -166,14 +166,14 @@ Once you have it, you can run Docker container following way
 This way, you are bind mount your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension.
 
 ```
-> touch imasdb/test/3/0/ids_10001.populate
+> echo "" > imasdb/test/3/0/ids_10001.populate
 ````
 
 # Setting up external volume for MySQL data
 
 In case of large data sets you might be interested in storing data outside Docker container. It is possible by attaching your local directory to `/usr/local/mysql/mysql_storage`
 
-> Note that this is a subject to change in the future. Location was choosen arbitraly and may change in the future. It doesn't matter where your local files will be stored, you can choose any location you like
+> Note that this is a subject to change in the future. Location was chosen arbitrarily and may change in the future. It doesn't matter where your local files will be stored, you can choose any location you like
 
 Once you have a place for local data storage you can run Docker following way
 
