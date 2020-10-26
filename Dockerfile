@@ -14,7 +14,7 @@ RUN mkdir -p /opt/packages/
 WORKDIR /opt/packages/
 
 # Get the package and put the content in proper location
-RUN wget -q https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
+RUN wget -q https://cdn.mysql.com/archives/mysql-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 RUN tar -xf mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 RUN mkdir -p /usr/local/mysql
 RUN mv mysql-8.0.20-linux-glibc2.12-x86_64/* /usr/local/mysql
@@ -115,7 +115,13 @@ CMD /opt/run.sh
 
 
 # Install imas-inotify and dependencies
-RUN git clone https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify \
+ARG INOTIFY_TAG
+ENV INOTIFY_TAG_BASH=${INOTIFY_TAG:-master}
+
+RUN echo "INOTIFY_TAG:      ${INOTIFY_TAG}"
+RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
+
+RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify \
     && sudo pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
 
 # Enable imas-inotify service
