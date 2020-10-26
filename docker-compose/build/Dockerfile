@@ -34,13 +34,13 @@ RUN useradd --create-home --shell /bin/bash imas && \
 
 FROM base AS client
 
-COPY files/updateprocess.sh /updateprocess.sh
-
 RUN sh -c 'cd /catalog_qt_2/client/catalog-ws-client; mvn package -DskipTests'
 
 ################################################################################
 
 FROM client AS updateprocess
+
+COPY files/updateprocess.sh /updateprocess.sh
 
 CMD /updateprocess.sh
 
