@@ -32,6 +32,17 @@ RUN useradd --create-home --shell /bin/bash imas && \
 
 ################################################################################
 
+FROM base AS server
+
+COPY files/server.sh /server.sh
+
+RUN sed -i 's/localhost/db/g' /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties && \
+    sh -c 'cd /catalog_qt_2/server/catalog-ws-server; mvn package -DskipTests'
+
+CMD /server.sh
+
+################################################################################
+
 FROM base AS client
 
 RUN sh -c 'cd /catalog_qt_2/client/catalog-ws-client; mvn package -DskipTests'
@@ -43,17 +54,6 @@ FROM client AS updateprocess
 COPY files/updateprocess.sh /updateprocess.sh
 
 CMD /updateprocess.sh
-
-################################################################################
-
-FROM base AS server
-
-COPY files/server.sh /server.sh
-
-RUN sed -i 's/localhost/db/g' /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties && \
-    sh -c 'cd /catalog_qt_2/server/catalog-ws-server; mvn package -DskipTests'
-
-CMD /server.sh
 
 ################################################################################
 
