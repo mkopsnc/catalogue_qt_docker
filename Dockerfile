@@ -115,7 +115,13 @@ CMD /opt/run.sh
 
 
 # Install imas-inotify and dependencies
-RUN git clone https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify \
+ARG INOTIFY_TAG
+ENV INOTIFY_TAG_BASH=${INOTIFY_TAG:-master}
+
+RUN echo "INOTIFY_TAG:      ${INOTIFY_TAG}"
+RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
+
+RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify \
     && sudo pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
 
 # Enable imas-inotify service
