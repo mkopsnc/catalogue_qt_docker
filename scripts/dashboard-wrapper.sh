@@ -25,4 +25,4 @@ python3 /home/imas/opt/demonstrator-dashboard/manage.py makemigrations && \
 python3 /home/imas/opt/demonstrator-dashboard/manage.py migrate && \
 python3 /home/imas/opt/demonstrator-dashboard/manage.py loaddata /home/imas/opt/demonstrator-dashboard/dashboard/fixtures/keycloak.json && \
 python3 /home/imas/opt/demonstrator-dashboard/manage.py keycloak_refresh_realm && \
-python3 /home/imas/opt/demonstrator-dashboard/manage.py runserver 0:8082 &
+python3 /home/imas/opt/demonstrator-dashboard/manage.py runserver 0:8082
