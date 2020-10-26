@@ -14,7 +14,7 @@ RUN mkdir -p /opt/packages/
 WORKDIR /opt/packages/
 
 # Get the package and put the content in proper location
-RUN wget -q https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
+RUN wget -q https://cdn.mysql.com/archives/mysql-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 RUN tar -xf mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 RUN mkdir -p /usr/local/mysql
 RUN mv mysql-8.0.20-linux-glibc2.12-x86_64/* /usr/local/mysql
