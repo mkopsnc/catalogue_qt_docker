@@ -9,4 +9,4 @@ while :; do
 done
 
 cd imas-inotify
-exec ./imas-inotify.py --config /config.ini --verbose
+exec ./imas-inotify.py --verbose

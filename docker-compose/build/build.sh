@@ -1,86 +1,86 @@
 #! /bin/bash
+DEFAULT_CATALOGQT_REPO='--single-branch --branch v1.3 https://gforge6.eufus.eu/git/catalog_qt_2'
+DEFAULT_DASHBOARD_REPO='--single-branch --branch v1.3 https://gitlab.com/fair-for-fusion/demonstrator-dashboard'
+DEFAULT_IMAS_INOTIFY_REPO='--single-branch --branch 0.5.1 https://github.com/tzok/imas-inotify'
 
 function helpexit {
-  echo ""
+  echo
   echo 'syntax: ./build.sh [-catalogqt-repo="catalog_qt2 repo with branch if needed"]'
   echo '                   [-dashboard-repo="dashboard repo with branch if needed"]'
   echo '                   [-imas-inotify-repo="imas-notify repo with branch if needed"]'
   echo '                   [-help]'
-  echo ""
-  echo ""
-  echo "-catalogqt-repo    - you can pass location of repository and specify branch"
-  echo "                     example: -catalogqt-repo=\"--single-branch --branch v1.3 \\"
-  echo "                              https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2\""
-  echo ""
-  echo "-dashboard-repo    - you can pass location of repository and specify branch"
-  echo "                     example: -dashboard-repo=\"--single-branch --branch v1.3 \\"
-  echo "                              https://gitlab.com/fair-for-fusion/demonstrator-dashboard\""
-  echo ""
-  echo "-imas-inotify-repo - you can pass location of repository and specify branch"
-  echo "                     example: -imas-inotify-repo=\"--single-branch --branch 0.4 \\"
-  echo "                              https://github.com/tzok/imas-inotify\""
-  echo ""
+  echo
+  echo
+  echo '-catalogqt-repo    - you can pass location of repository and specify branch'
+  echo "                     example: -catalogqt-repo=\"${DEFAULT_CATALOGQT_REPO}\""
+  echo
+  echo '-dashboard-repo    - you can pass location of repository and specify branch'
+  echo "                     example: -dashboard-repo=\"${DEFAULT_DASHBOARD_REPO}\""
+  echo
+  echo '-imas-inotify-repo - you can pass location of repository and specify branch'
+  echo "                     example: -imas-inotify-repo=\"${DEFAULT_IMAS_INOTIFY_REPO}\""
+  echo
   echo "-help/--help       - prints help and quits"
-  echo ""
-  echo ""
+  echo
+  echo
   exit 1
 }
 
-CATALOG_QT_REPO="--single-branch --branch v1.3 https://gforge6.eufus.eu/git/catalog_qt_2"
-DASHBOARD_REPO="--single-branch --branch v1.3 https://gitlab.com/fair-for-fusion/demonstrator-dashboard"
-IMAS_INOTIFY_REPO="--single-branch --branch 0.4 https://github.com/tzok/imas-inotify"
+options=$(getopt --alternative --options h --longoptions help,catalogqt-repo:,dashboard-repo:,imas-inotify-repo: -- "$@")
+eval set -- "${options}"
 
-for i in "$@"
-do
-case $i in
-    # common arguments
-    -help)
-    helpexit
-    shift
-    ;;
-    --help)
-    helpexit
-    shift
-    ;;
-    -catalogqt-repo=*)
-    CATALOG_QT_REPO="${i#*=}"
-    shift # past argument=value
-    ;;
-    -dashboard-repo=*)
-    DASHBOARD_REPO="${i#*=}"
-    shift # past argument=value
-    ;;
-    -imas-notify-repo=*)
-    IMAS_INOTIFY_REPO="${i#*=}"
-    shift # past argument=value
-    ;;
-    *)
-    # unknown option
-    ;;
-esac
+while :; do
+    case $1 in
+        --catalogqt-repo)
+            CATALOGQT_REPO="$2"
+            shift 2
+            ;;
+        --dashboard-repo)
+            DASHBOARD_REPO="$2"
+            shift 2
+            ;;
+        --imas-inotify-repo)
+            IMAS_INOTIFY_REPO="$2"
+            shift 2
+            ;;
+        -h|--help)
+            helpexit
+            ;;
+        --)
+            break
+            ;;
+    esac
 done
 
-echo "Retrieving imas/ual image from rhus-71.man.poznan.pl - make sure to provide correct login/password"
+CATALOGQT_REPO="${CATALOGQT_REPO:-$DEFAULT_CATALOGQT_REPO}"
+DASHBOARD_REPO="${DASHBOARD_REPO:-$DEFAULT_DASHBOARD_REPO}"
+IMAS_INOTIFY_REPO="${IMAS_INOTIFY_REPO:-$DEFAULT_IMAS_INOTIFY_REPO}"
+
+echo 'Retrieving imas/ual image from rhus-71.man.poznan.pl - make sure to provide correct login/password'
 docker login rhus-71.man.poznan.pl
 docker pull rhus-71.man.poznan.pl/imas/ual
 docker tag rhus-71.man.poznan.pl/imas/ual imas/ual
 
-echo "Retrieving catalog_qt_2 - make sure to provide correct login/password"
 if [[ ! -d catalog_qt_2 ]]; then
-    git clone $CATALOG_QT_REPO
+    echo "Retrieving catalog_qt_2 - make sure to provide correct login/password"
+    git clone $CATALOGQT_REPO
+else
+    echo "Using existing catalog_qt_2 directory (git describe => $(cd catalog_qt_2; git describe))"
 fi
 
-echo "Retrieving demonstrator dashboard - make sure to provide correct login/password"
 if [[ ! -d demonstrator-dashboard ]]; then
+    echo 'Retrieving demonstrator dashboard - make sure to provide correct login/password'
     git clone $DASHBOARD_REPO
+else
+    echo "Using existing demonstrator-dashboard directory (git describe => $(cd demonstrator-dashboard; git describe))"
 fi
 
-echo "Retrieving imas-inotify - make sure to provide correct login/password"
 if [[ ! -d imas-inotify ]]; then
+    echo 'Retrieving imas-inotify - make sure to provide correct login/password'
     git clone $IMAS_INOTIFY_REPO
+else
+    echo "Using existing imas-inotify directory (git describe => $(cd imas-inotify; git describe))"
 fi
-
-exit 1
 
 docker build \
     --target updateprocess \

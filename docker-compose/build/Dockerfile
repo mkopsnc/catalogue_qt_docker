@@ -59,11 +59,10 @@ CMD /updateprocess.sh
 
 FROM client AS inotify
 
-COPY files/config.ini /config.ini
+COPY imas-inotify /imas-inotify
 COPY files/inotify.sh /inotify.sh
 
-RUN git clone -b develop https://github.com/tzok/imas-inotify.git && \
-    pip3 install -r imas-inotify/requirements.txt
+RUN pip3 install -r imas-inotify/requirements.txt
 
 CMD /inotify.sh
 
