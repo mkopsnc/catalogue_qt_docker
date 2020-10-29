@@ -66,7 +66,6 @@ COPY files/inotify-entrypoint.sh /inotify-entrypoint.sh
 
 RUN pip3 install -r imas-inotify/requirements.txt
 
-ENTRYPOINT ["/inotify-entrypoint.sh"]
 CMD ["/inotify.sh"]
 
 ################################################################################
@@ -74,7 +73,6 @@ CMD ["/inotify.sh"]
 FROM python AS dashboard
 
 COPY demonstrator-dashboard /demonstrator-dashboard
-COPY files/dashboard-secrets.json /demonstrator-dashboard/dashboard/settings/secrets.json
 COPY files/dashboard.sh /dashboard.sh
 COPY files/demonstrator-dashboard.patch /tmp/demonstrator-dashboard.patch
 

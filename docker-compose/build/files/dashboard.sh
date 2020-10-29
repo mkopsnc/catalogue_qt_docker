@@ -9,6 +9,7 @@ while :; do
 done
 
 cd /demonstrator-dashboard
+cp /docker-entrypoint-properties.d/dashboard-secrets.json dashboard/settings/secrets.json
 python dashboard/settings/create.py && \
     python manage.py makemigrations && \
     python manage.py migrate && \

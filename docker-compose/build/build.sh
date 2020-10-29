@@ -24,13 +24,15 @@ function helpexit {
   echo '-imas-inotify-repo - you can pass location of repository and specify branch'
   echo "                     example: -imas-inotify-repo=\"${DEFAULT_IMAS_INOTIFY_REPO}\""
   echo
-  echo "-help/--help       - prints help and quits"
+  echo '-force             - perform git-checkout and git-pull, even for existing directories'
+  echo '                     (beware: this option will cause full image rebuilt without cache)'
+  echo '-help/--help       - prints help and quits'
   echo
   echo
   exit 1
 }
 
-options=$(getopt --alternative --options h --longoptions help,catalogqt-repo:,dashboard-repo:,imas-inotify-repo: -- "$@")
+options=$(getopt --alternative --options h --longoptions force,help,catalogqt-repo:,dashboard-repo:,imas-inotify-repo: -- "$@")
 eval set -- "${options}"
 
 while :; do
@@ -49,6 +51,10 @@ while :; do
             ;;
         -h|--help)
             helpexit
+            ;;
+        --force)
+            FORCE=1
+            shift
             ;;
         --)
             break
@@ -69,23 +75,41 @@ if [[ ! -d catalog_qt_2 ]]; then
     echo "Retrieving catalog_qt_2 - make sure to provide correct login/password"
     git clone $CATALOGQT_REPO
 else
-    # (cd catalog_qt_2; git checkout ${CATALOGQT_BRANCH})
-    echo "Using existing catalog_qt_2 directory (git describe => $(cd catalog_qt_2; git describe))"
+    if [[ -n "${FORCE}" ]]; then
+        echo "Updating catalog_qt_2 - make sure to provide correct login/password"
+        cd catalog_qt_2
+        git checkout ${CATALOGQT_BRANCH}
+        git pull
+        cd ..
+    fi
+    echo "Using catalog_qt_2 directory (git describe => $(cd catalog_qt_2; git describe))"
 fi
 
 if [[ ! -d demonstrator-dashboard ]]; then
     echo 'Retrieving demonstrator dashboard - make sure to provide correct login/password'
     git clone $DASHBOARD_REPO
 else
-    # (cd demonstrator-dashboard; git checkout ${DASHBOARD_BRANCH})
-    echo "Using existing demonstrator-dashboard directory (git describe => $(cd demonstrator-dashboard; git describe))"
+    if [[ -n "${FORCE}" ]]; then
+        echo 'Updating demonstrator dashboard - make sure to provide correct login/password'
+        cd demonstrator-dashboard
+        git checkout ${DASHBOARD_BRANCH}
+        git pull
+        cd ..
+    fi
+    echo "Using demonstrator-dashboard directory (git describe => $(cd demonstrator-dashboard; git describe))"
 fi
 
 if [[ ! -d imas-inotify ]]; then
     echo 'Retrieving imas-inotify - make sure to provide correct login/password'
     git clone $IMAS_INOTIFY_REPO
 else
-    # (cd imas-inotify; git checkout ${IMAS_INOTIFY_BRANCH})
+    if [[ -n "${FORCE}" ]]; then
+        echo 'Updating imas-inotify - make sure to provide correct login/password'
+        cd imas-inotify
+        git checkout ${IMAS_INOTIFY_BRANCH}
+        git pull
+        cd ..
+    fi
     echo "Using existing imas-inotify directory (git describe => $(cd imas-inotify; git describe))"
 fi
 
