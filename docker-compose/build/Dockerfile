@@ -22,7 +22,7 @@ RUN apt-get update -y && \
 
 COPY catalog_qt_2 /catalog_qt_2
 
-RUN sh -c 'cd /catalog_qt_2/common/catalog-ws-common; mvn install -DskipTests' && \
+RUN mvn --file /catalog_qt_2/common/catalog-ws-common/pom.xml install -DskipTests && \
     mvn install:install-file -Dfile=/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
     cp /opt/imas/core/IMAS/*/jar/imas.jar /tmp/imas.jar && \
     mvn install:install-file -Dfile=/tmp/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar
@@ -35,17 +35,18 @@ RUN useradd --create-home --shell /bin/bash imas && \
 FROM base AS server
 
 COPY files/server.sh /server.sh
+COPY files/catalog_qt_2.patch /tmp/catalog_qt_2.patch
 
-RUN sed -i 's/localhost/db/g' /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties && \
-    sh -c 'cd /catalog_qt_2/server/catalog-ws-server; mvn package -DskipTests'
+RUN patch -p0 < /tmp/catalog_qt_2.patch && \
+    mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
 
-CMD /server.sh
+CMD ["/server.sh"]
 
 ################################################################################
 
 FROM base AS client
 
-RUN sh -c 'cd /catalog_qt_2/client/catalog-ws-client; mvn package -DskipTests'
+RUN mvn --file /catalog_qt_2/client/catalog-ws-client/pom.xml package -DskipTests
 
 ################################################################################
 
@@ -53,7 +54,7 @@ FROM client AS updateprocess
 
 COPY files/updateprocess.sh /updateprocess.sh
 
-CMD /updateprocess.sh
+CMD ["/updateprocess.sh"]
 
 ################################################################################
 
@@ -61,10 +62,12 @@ FROM client AS inotify
 
 COPY imas-inotify /imas-inotify
 COPY files/inotify.sh /inotify.sh
+COPY files/inotify-entrypoint.sh /inotify-entrypoint.sh
 
 RUN pip3 install -r imas-inotify/requirements.txt
 
-CMD /inotify.sh
+ENTRYPOINT ["/inotify-entrypoint.sh"]
+CMD ["/inotify.sh"]
 
 ################################################################################
 
@@ -73,8 +76,9 @@ FROM python AS dashboard
 COPY demonstrator-dashboard /demonstrator-dashboard
 COPY files/dashboard-secrets.json /demonstrator-dashboard/dashboard/settings/secrets.json
 COPY files/dashboard.sh /dashboard.sh
+COPY files/demonstrator-dashboard.patch /tmp/demonstrator-dashboard.patch
 
-RUN pip install -r /demonstrator-dashboard/requirements.txt && \
-    sed -i '/API_ROOT =/ a API_ROOT = "http://server:8080/"' /demonstrator-dashboard/db_api/services.py
+RUN patch -p0 < /tmp/demonstrator-dashboard.patch && \
+    pip install -r /demonstrator-dashboard/requirements.txt
 
-CMD /dashboard.sh
+CMD ["/dashboard.sh"]

@@ -12,6 +12,6 @@ cd /demonstrator-dashboard
 python dashboard/settings/create.py && \
     python manage.py makemigrations && \
     python manage.py migrate && \
-#    python manage.py loaddata dashboard/fixtures/keycloak.json && \
-#    python manage.py keycloak_refresh_realm && \
+    python manage.py loaddata dashboard/fixtures/keycloak.json && \
+    python manage.py keycloak_refresh_realm && \
     exec python manage.py runserver 0:8082
