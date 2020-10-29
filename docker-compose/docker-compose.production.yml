@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  inotify:
+    volumes:
+      - ./fair4fusion-production:/docker-entrypoint-properties.d
+
+volumes:
+  imasdb:

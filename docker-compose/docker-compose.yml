@@ -27,3 +27,4 @@ services:
     image: catalogqt/inotify
     volumes:
       - imasdb:/home/imas/public/imasdb
+      - ./fair4fusion-docker-demo:/docker-entrypoint-properties.d

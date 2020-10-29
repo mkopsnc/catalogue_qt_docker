@@ -1,7 +1,11 @@
 #! /bin/bash
-DEFAULT_CATALOGQT_REPO='--single-branch --branch v1.3 https://gforge6.eufus.eu/git/catalog_qt_2'
-DEFAULT_DASHBOARD_REPO='--single-branch --branch v1.3 https://gitlab.com/fair-for-fusion/demonstrator-dashboard'
-DEFAULT_IMAS_INOTIFY_REPO='--single-branch --branch 0.5.1 https://github.com/tzok/imas-inotify'
+CATALOGQT_BRANCH=master
+DASHBOARD_BRANCH=psnc/develop
+IMAS_INOTIFY_BRANCH=develop
+
+DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge6.eufus.eu/git/catalog_qt_2"
+DEFAULT_DASHBOARD_REPO="--single-branch --branch ${DASHBOARD_BRANCH} https://gitlab.com/fair-for-fusion/demonstrator-dashboard"
+DEFAULT_IMAS_INOTIFY_REPO="--single-branch --branch ${IMAS_INOTIFY_BRANCH} https://github.com/tzok/imas-inotify"
 
 function helpexit {
   echo
@@ -65,6 +69,7 @@ if [[ ! -d catalog_qt_2 ]]; then
     echo "Retrieving catalog_qt_2 - make sure to provide correct login/password"
     git clone $CATALOGQT_REPO
 else
+    # (cd catalog_qt_2; git checkout ${CATALOGQT_BRANCH})
     echo "Using existing catalog_qt_2 directory (git describe => $(cd catalog_qt_2; git describe))"
 fi
 
@@ -72,6 +77,7 @@ if [[ ! -d demonstrator-dashboard ]]; then
     echo 'Retrieving demonstrator dashboard - make sure to provide correct login/password'
     git clone $DASHBOARD_REPO
 else
+    # (cd demonstrator-dashboard; git checkout ${DASHBOARD_BRANCH})
     echo "Using existing demonstrator-dashboard directory (git describe => $(cd demonstrator-dashboard; git describe))"
 fi
 
@@ -79,6 +85,7 @@ if [[ ! -d imas-inotify ]]; then
     echo 'Retrieving imas-inotify - make sure to provide correct login/password'
     git clone $IMAS_INOTIFY_REPO
 else
+    # (cd imas-inotify; git checkout ${IMAS_INOTIFY_BRANCH})
     echo "Using existing imas-inotify directory (git describe => $(cd imas-inotify; git describe))"
 fi
 
