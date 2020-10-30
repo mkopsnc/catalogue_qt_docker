@@ -120,32 +120,37 @@ else
     echo "Using existing imas-inotify directory (git describe => $(cd imas-inotify; git describe))"
 fi
 
+# build all stages
 docker build \
     $BUILD_ARGS \
+    .
+
+# use cache, tag updateprocess
+docker build \
     --target updateprocess \
     --tag catalogqt/updateprocess \
     .
 
+# use cache, tag server
 docker build \
-    $BUILD_ARGS \
     --target server \
     --tag catalogqt/server \
     .
 
+# use cache, tag db
 docker build \
-    $BUILD_ARGS \
     --target db \
     --tag catalogqt/db \
     .
 
+# use cache, tag inotify
 docker build \
-    $BUILD_ARGS \
     --target inotify \
     --tag catalogqt/inotify \
     .
 
+# use cache, tag dashboard
 docker build \
-    $BUILD_ARGS \
     --target dashboard \
     --tag catalogqt/dashboard \
     .
