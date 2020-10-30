@@ -26,13 +26,16 @@ function helpexit {
   echo
   echo '-force             - perform git-checkout and git-pull, even for existing directories'
   echo '                     (beware: this option will cause full image rebuilt without cache)'
+  echo
+  echo '-no-cache          - do not use Docker cache when building images'
+  echo
   echo '-help/--help       - prints help and quits'
   echo
   echo
   exit 1
 }
 
-options=$(getopt --alternative --options h --longoptions force,help,catalogqt-repo:,dashboard-repo:,imas-inotify-repo: -- "$@")
+options=$(getopt --alternative --options h --longoptions force,help,no-cache,catalogqt-repo:,dashboard-repo:,imas-inotify-repo: -- "$@")
 eval set -- "${options}"
 
 while :; do
@@ -54,6 +57,10 @@ while :; do
             ;;
         --force)
             FORCE=1
+            shift
+            ;;
+        --no-cache)
+            BUILD_ARGS=--no-cache
             shift
             ;;
         --)
@@ -114,26 +121,31 @@ else
 fi
 
 docker build \
+    $BUILD_ARGS \
     --target updateprocess \
     --tag catalogqt/updateprocess \
     .
 
 docker build \
+    $BUILD_ARGS \
     --target server \
     --tag catalogqt/server \
     .
 
 docker build \
+    $BUILD_ARGS \
     --target db \
     --tag catalogqt/db \
     .
 
 docker build \
+    $BUILD_ARGS \
     --target inotify \
     --tag catalogqt/inotify \
     .
 
 docker build \
+    $BUILD_ARGS \
     --target dashboard \
     --tag catalogqt/dashboard \
     .
