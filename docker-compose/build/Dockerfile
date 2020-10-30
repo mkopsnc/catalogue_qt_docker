@@ -62,7 +62,6 @@ FROM client AS inotify
 
 COPY imas-inotify /imas-inotify
 COPY files/inotify.sh /inotify.sh
-COPY files/inotify-entrypoint.sh /inotify-entrypoint.sh
 
 RUN pip3 install -r imas-inotify/requirements.txt
 
