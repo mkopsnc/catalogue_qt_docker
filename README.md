@@ -4,131 +4,55 @@ This container is desined to simplify installation of Catalogue QT and it's comp
 
 # Getting Docker file for Catalog QT image
 
-This container requires `imas/fc2k` Docker image. Before you proceed, make sure to install it on your system. You can follow instructions here: [Installing IMAS Docker](https://docs.psnc.pl/display/WFMS/IMAS+@+Docker). Once you have it installed on your system, you can create `Catalogue QT Docker`.
+In order to build this container, you will need access to few repositories. This container is based on `imas/ual` Docker image. This image is available from Docker registry
 
 ```
-> git clone --single-branch --branch v1.3 \
-  https://github.com/mkopsnc/catalogue_qt_docker.git
-  
-> cd catalogue_qt_docker
+rhus-71.man.poznan.pl
 ```
 
-# Things to do, before you have started building the container.
-
-## Make sure to prepare sources of `Catalogue QT 2`
+Before you proceed, make sure you can access the registry. You can test it by executing following command
 
 ```
-> git clone --single-branch --branch v1.3 \
-  https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
-  
-> tar cf external/catalog_qt_2.tar ./catalog_qt_2
+docker login rhus-71.man.poznan.pl
 ```
 
-## Make sure to prepare source of `Demonstrator Dashboard`
+You will also need an access to `catalog_qt_2` and `demonstrator-dashboar` projects. You can check whether you have an access by calling
 
 ```
-> git clone --single-branch --branch v1.3 \
-  https://gitlab.com/fair-for-fusion/demonstrator-dashboard
-  
-> tar cf external/demonstrator-dashboard.tar ./demonstrator-dashboard
+> git clone https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+
+> git clone https://gitlab.com/fair-for-fusion/demonstrator-dashboard
 ```
 
 ***
 
-# Building development version of Docker
+# Building and running container
 
-> Note that this section is for people who work with development release of Catalog QT - Docker
-
-In case you want to build development version of `Catalog QT - Docker` you have to use following branches
+In order to build and run container you have to do following
 
 ```
-> git clone --single-branch --branch master \
-  https://github.com/mkopsnc/catalogue_qt_docker.git
-  
-> cd catalogue_qt_docker
-```
-
-```
-> git clone --single-branch --branch develop \
-  https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2
-  
-> tar cf external/catalog_qt_2.tar ./catalog_qt_2
-```
-
-```
-> git clone --single-branch --branch psnc/develop \
-  https://gitlab.com/fair-for-fusion/demonstrator-dashboard
-  
-> tar cf external/demonstrator-dashboard.tar ./demonstrator-dashboard
+> cd docker-compose/build
+> ./build.sh
+> cd ..
+> docker-compose up 
 ```
 
 ***
-
-# Building container
-
-Once both projects are in place, you can build the container.
-
-```
-> docker build -t catalogqt .
-```
-
-Please note that for tagged release you have to specify tag of the `imas-notify` project. You can do it following way
-
-```
-> docker build -t catalogqt --build-arg INOTIFY_TAG=0.4 .
-```
 
 # Starting container
 
 Starting the container is quite simple, all you have to do is to run
 
 ```
-> docker run -i -t --name catalogqt_test catalogqt
+> docker-compose run
 ```
-Once inside, you are "logged in" as user `imas`. All `Catalogue QT` related services are started automatically.
-
-## Exposing Spring Boot based Web Services to the outside world
-
-If you want to access `Catalog QT WS API` outside of the container, you can expose its ports:
-
-```
-> docker run -i -t -p 8080:8080 --name catalogqt_test catalogqt
-```
-
-## Exposing Demonstrator Dashboard
-
-By default, Demonstrator Dashboard ports are not exposed. If you want to access Demonstrator Dashboard, you can do it following way
-
-```
-> docker run -i \
-  -p 8080:8080 \
-  -p 8082:8082 \
-  --add-host=catalog.eufus.eu:127.0.0.1 \
-  --name catalogqt_test -t catalogqt
-```
-
-## Exposing MySQL ports
-
-For development purposes it might be useful to access data directly inside MySQL instance. You can do it following way
-
-```
-> docker run -i \
-  -p 8080:8080 \
-  -p 8082:8082 \
-  -p 3306:3306 \
-  -p 33060:33060 \
-  --add-host=catalog.eufus.eu:127.0.0.1 \
-  --name catalogqt_test -t catalogqt
-```
-
-Once container is started you can navigate to:
 
 - [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
 - [localhost:8082](http://localhost:8082) to access Demonstrator Dashboard
 
 # Importing data from pulse file
 
-Catalog QT Demonstrator allows to import MDSPlus based data automatically into database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. You can do it with `-v` option.
+Catalog QT Demonstrator allows to import MDSPlus based data automatically into SQL database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. Easiest way to do it is to create directory (or symbolic link) to a MDSPlus compatible local database.
 
 First of all, make sure you have `MDSPlus` like directory structure with pulse files.
 
@@ -151,42 +75,21 @@ imasdb
         `-- 9
 ```
 
-Once you have it, you can run Docker container following way
+Once you have it, create a symbolic link insde docker-compose directory and run container
 
 ```
-> docker run -i -p 8080:8080 \
-  -p 8082:8082 \
-  -p 3306:3306 \
-  -p 33060:33060 \
-  --add-host=catalog.eufus.eu:127.0.0.1 \
-  -v `pwd`/imasdb:/home/imas/public/imasdb \
-  --name catalogqt_test -t catalogqt
+> docker-compose run
 ```
 
-This way, you are bind mount your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension.
+This way, you have bind mounted your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension.
 
 ```
 > echo "" > imasdb/test/3/0/ids_10001.populate
-````
+```
 
 # Setting up external volume for MySQL data
 
-In case of large data sets you might be interested in storing data outside Docker container. It is possible by attaching your local directory to `/usr/local/mysql/mysql_storage`
-
-> Note that this is a subject to change in the future. Location was chosen arbitrarily and may change in the future. It doesn't matter where your local files will be stored, you can choose any location you like
-
-Once you have a place for local data storage you can run Docker following way
-
-```
-> docker run -i -p 8080:8080 \
-  -p 8082:8082 \
-  -p 3306:3306 \
-  -p 33060:33060 \
-  --add-host=catalog.eufus.eu:127.0.0.1 \
-  -v `pwd`/imasdb:/home/imas/public/imasdb \
-  -v `pwd`/mysql_storage:/usr/local/mysql/mysql_storage \
-  --name catalogqt_test -t catalogqt
-```
+TBD
 
 # Known limitations
 
