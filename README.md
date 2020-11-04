@@ -90,9 +90,7 @@ Starting the container is quite simple, all you have to do is to run
 
 Catalog QT Demonstrator allows to import MDSPlus based data automatically into SQL database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. Easiest way to do it is to create directory (or symbolic link) to a MDSPlus compatible local database.
 
-First of all, make sure you have `MDSPlus` like directory structure with pulse files. Easies way to execute Docker container with sample data is to:
-
-- get sample data
+First of all, make sure you have `MDSPlus` like directory structure with pulse files. Easies way to execute Docker container with sample data is to get sample data from `box.psnc.pl` - these are completely artificially created data prepared by testing framework.
 
 ```
 > curl -s -o f4f_data.tar.gz \
