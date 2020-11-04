@@ -62,7 +62,7 @@ This repository is publicly available. All you have to do, is to double check wh
 
 ***
 
-# Building and running container
+# Building container
 
 In order to build and run container you have to do following
 
@@ -85,6 +85,8 @@ Starting the container is quite simple, all you have to do is to run
 
 - [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
 - [localhost:8082](http://localhost:8082) to access Demonstrator Dashboard
+
+***
 
 # Importing data from pulse file
 
@@ -149,9 +151,13 @@ This way, you have bind mounted your local filesystem inside Docker container. O
   <img src="https://raw.githubusercontent.com/mkopsnc/catalogue_qt_docker/master/images/docker-compose.gif">
 </p>
 
+***
+
 # Setting up external volume for MySQL data
 
 TBD
+
+***
 
 # Known limitations
 
