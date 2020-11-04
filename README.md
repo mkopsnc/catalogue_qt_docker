@@ -90,37 +90,61 @@ Starting the container is quite simple, all you have to do is to run
 
 Catalog QT Demonstrator allows to import MDSPlus based data automatically into SQL database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. Easiest way to do it is to create directory (or symbolic link) to a MDSPlus compatible local database.
 
-First of all, make sure you have `MDSPlus` like directory structure with pulse files.
+First of all, make sure you have `MDSPlus` like directory structure with pulse files. Easies way to execute Docker container with sample data is to:
+
+- get sample data
 
 ```
-imasdb
-`-- test
-    `-- 3
-        |-- 0
-        |   |-- ids_10001.characteristics
-        |   |-- ids_10001.datafile
-        |   `-- ids_10001.tree
-        |-- 1
-        |-- 2
-        |-- 3
-        |-- 4
-        |-- 5
-        |-- 6
-        |-- 7
-        |-- 8
-        `-- 9
+> curl -s -o f4f_data.tar.gz \
+    https://box.psnc.pl/f/4a18aa64dd/\?raw=1
 ```
 
-Once you have it, create a symbolic link insde docker-compose directory and run container
+Make sure your directories structure looks like this
 
 ```
-> docker-compose run
+.
+|-- catalogue_qt_docker
+|   |-- docker-compose
+|   |-- images
+|   `-- single-container
+`-- f4f-data
+    `-- imasdb
+        |-- f4f
+        |   `-- 3
+        |       |-- 0
+        |       |   |-- ids_11062020.characteristics
+        |       |   |-- ids_11062020.datafile
+        |       |   |-- ids_11062020.populate
+        |       |   |-- ids_11062020.tree
+        |       |   |-- ids_11062021.characteristics
+        |       |   |-- ids_11062021.datafile
+        |       |   |-- ids_11062021.populate
+        |       |   `-- ids_11062021.tree
+        |       |-- 1
+        |       |-- 2
+        |       |-- 3
+        |       |-- 4
+        |       |-- 5
+        |       |-- 6
+        |       |-- 7
+        |       |-- 8
+        |       `-- 9
+        `-- script.sh
 ```
 
-This way, you have bind mounted your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension.
+Make sure that data directory is linked inside `docker-compose` - we have to make sure that Docker container can see our local data. Once it is done, you can run Docker container.
 
 ```
-> echo "" > imasdb/test/3/0/ids_10001.populate
+> cd catalogue_qt_docker/docker-compose
+> ln -s ../../f4f-data/imasdb
+> docker-container up
+```
+
+This way, you have bind mounted your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension. You can do it following way. Inside directory with data execute `script.sh` with the name of database you want to have populated.
+
+```
+> cd f4f-data/imasdb
+> ./script.sh f4f
 ```
 
 <p align="center">
