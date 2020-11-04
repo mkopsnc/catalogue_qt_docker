@@ -123,6 +123,10 @@ This way, you have bind mounted your local filesystem inside Docker container. O
 > echo "" > imasdb/test/3/0/ids_10001.populate
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mkopsnc/catalogue_qt_docker/master/images/docker-compose.gif">
+</p>
+
 # Setting up external volume for MySQL data
 
 TBD
