@@ -92,7 +92,7 @@ Starting the container is quite simple, all you have to do is to run
 
 Catalog QT Demonstrator allows to import MDSPlus based data automatically into SQL database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. Easiest way to do it is to create directory (or symbolic link) to a MDSPlus compatible local database.
 
-First of all, make sure you have `MDSPlus` like directory structure with pulse files. Easies way to execute Docker container with sample data is to get sample data from `box.psnc.pl` - these are completely artificially created data prepared by testing framework.
+First of all, make sure you have `MDSPlus` like directory structure with pulse files. The easiest way to execute Docker container with sample data is to get sample data from `box.psnc.pl` - these are completely artificially created data prepared by testing framework.
 
 ```
 > curl -s -o f4f_data.tar.gz \
@@ -155,7 +155,25 @@ This way, you have bind mounted your local filesystem inside Docker container. O
 
 # Setting up external volume for MySQL data
 
-TBD
+To use an external volume for MySQL, you need to edit `docker-compose/docker-compose.override.yml` file like here:
+
+```diff
+@@ -4,6 +4,7 @@
+   server:
+     volumes:
+       - ./imasdb:/home/imas/public/imasdb
++      - /path/to/volume:/var/lib/mysql
+
+   updateprocess:
+     volumes:
+```
+
+The added line contains a path to your external volume as seen by the host OS (e.g. `/mnt/vdb1' or `/home/user/catalogqt-mysql`). If your instance of Catalogue QT is already running, it is advisable to remove it and start from scratch:
+
+```
+docker-compose rm
+docker-compose up
+```
 
 ***
 
