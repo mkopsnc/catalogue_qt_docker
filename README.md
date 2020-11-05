@@ -168,7 +168,9 @@ To use an external volume for MySQL, you need to edit `docker-compose/docker-com
      volumes:
 ```
 
-The added line contains a path to your external volume as seen by the host OS (e.g. `/mnt/vdb1' or `/home/user/catalogqt-mysql`). If your instance of Catalogue QT is already running, it is advisable to remove it and start from scratch:
+The added line contains a path to your external volume as seen by the host OS (e.g. `/mnt/vdb1` or `/home/user/catalogqt-mysql`).
+
+If your instance of Catalogue QT is already running, it is advisable to remove it and start from scratch:
 
 ```
 docker-compose rm
