@@ -1,7 +1,7 @@
 #! /bin/bash
-CATALOGQT_BRANCH=master
-DASHBOARD_BRANCH=psnc/develop
-IMAS_INOTIFY_BRANCH=develop
+CATALOGQT_BRANCH=v1.4-20201103
+DASHBOARD_BRANCH=2020.11.03
+IMAS_INOTIFY_BRANCH=0.5.2-20201103
 
 DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge6.eufus.eu/git/catalog_qt_2"
 DEFAULT_DASHBOARD_REPO="--single-branch --branch ${DASHBOARD_BRANCH} https://gitlab.com/fair-for-fusion/demonstrator-dashboard"
