@@ -158,14 +158,17 @@ This way, you have bind mounted your local filesystem inside Docker container. O
 To use an external volume for MySQL, you need to edit `docker-compose/docker-compose.override.yml` file like here:
 
 ```diff
-@@ -4,6 +4,7 @@
+@@ -1,6 +1,10 @@
+ version: "3.6"
+ 
+ services:
++  db:
++    volumes:
++      - /path/to/storage:/var/lib/mysql
++
    server:
      volumes:
        - ./imasdb:/home/imas/public/imasdb
-+      - /path/to/volume:/var/lib/mysql
-
-   updateprocess:
-     volumes:
 ```
 
 The added line contains a path to your external volume as seen by the host OS (e.g. `/mnt/vdb1` or `/home/user/catalogqt-mysql`).
