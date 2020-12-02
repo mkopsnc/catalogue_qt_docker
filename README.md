@@ -96,7 +96,7 @@ First of all, make sure you have `MDSPlus` like directory structure with pulse f
 
 ```
 > curl -s -o f4f_data.tar.gz \
-    https://box.psnc.pl/f/4a18aa64dd/\?raw=1
+    https://box.psnc.pl/seafhttp/files/01953e73-8ad3-4277-be71-57b69c395355/f4f_data.tar.gz
 ```
 
 Make sure your directories structure looks like this
