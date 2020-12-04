@@ -196,8 +196,8 @@ It may happen that frame size of network interfaces might be missaligned between
 > ip link
 2: ens3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
     link/ether ....
-4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default
-    link/ether ....
+148: br-9533f8101c29: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff
 ```
 
 This may lead to issues while transferring data. To solve this issue you may need to change your `/etc/docker/daemon.json` file by adding
@@ -228,6 +228,48 @@ networks:
     driver_opts:
       com.docker.network.driver.mtu: 1458
 
+...
+...
+```
+
+## Restart might be required
+
+In case you have started your container already, you might have your network interface recreated. If you get following error after altering Docker's settings
+
+```
+> docker-compose up
+ERROR: Network "docker-compose_default" needs to be recreated - option 
+  "com.docker.network.driver.mtu" has changed
+```
+
+make sure to remove the network and bring everything up again
+
+```
+> docker-compose rm
+> docker network ls
+> docker network rm docker-compose_default # name of your network might depend on your settings
+> docker-compose up
+```
+
+This should solve your isse, all interfaces should have `MTU` being aligned
+
+```
+...
+...
+2: ens3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether ... brd ff:ff:ff:ff:ff:ff
+148: br-9533f8101c29: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc noqueue state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff
+150: vetha4ad5b7@if149: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc noqueue master br-9533f8101c29 state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff link-netnsid 0
+152: veth8514865@if151: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc noqueue master br-9533f8101c29 state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff link-netnsid 1
+154: vethee2a6b9@if153: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc noqueue master br-9533f8101c29 state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff link-netnsid 2
+156: vethb90a412@if155: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc noqueue master br-9533f8101c29 state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff link-netnsid 3
+158: vethf56cc8a@if157: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc noqueue master br-9533f8101c29 state UP mode DEFAULT group default
+    link/ether ... brd ff:ff:ff:ff:ff:ff link-netnsid 4
 ...
 ...
 ```
