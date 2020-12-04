@@ -185,3 +185,49 @@ docker-compose up
 # Known limitations
 
 Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Demonstrator Dashboard source repositories.
+
+***
+
+# Troubleshooting download issues inside Docker
+
+It may happen that frame size of network interfaces might be missaligned between your hardware and virtual network creted by Docker. In that case you can experience strange issues with network. For example, your data transfer rate drops to `0 kb/s`. You can examine this missalignment follwoing way: 
+
+```
+> ip link
+2: ens3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1458 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether ....
+4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default
+    link/ether ....
+```
+
+This may lead to issues while transferring data. To solve this issue you may need to change your `/etc/docker/daemon.json` file by adding
+
+```
+{
+  "mtu": ${SIZE_OF_THE_FRAME_OF_YOUR_NETWORK_DEVICE}
+}
+```
+
+for the above exaple it will be
+
+```
+{
+  "mtu": 1458
+}
+```
+
+If you are using docker-compose you want to modify `docker-compose.yml` as well
+
+```
+...
+...
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1454
+
+...
+...
+```
