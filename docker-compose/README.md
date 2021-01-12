@@ -23,6 +23,7 @@ You can edit `docker-compose.override.yml` to change:
 
 - The path where MySQL will store the data (default: `$(pwd)/db-data`)
 - The path where pulsefiles are stored on the host (default: `$(pwd)/imasdb`)
+- To map MySQL port to host port, so you can access the database from the container (by deafult no ports are exposed)
 
 After changing the settings, it may be necessary to restart from scratch:
 
