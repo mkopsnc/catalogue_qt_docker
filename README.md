@@ -20,6 +20,8 @@ In order to build this container, you will need access to few repositories. This
 - `demonstrator-dashboard`
 - `imas-inotify`
 
+**These catalogs should be placed in `docker-compose/build` directory**
+
 ## Make sure you can access imas/ual
  
 This `Catalogue Qt 2 Docker` image is based on `imas/ual` Docker image. It is available from Docker registry
@@ -41,15 +43,17 @@ You will be asked for a user name and password. If you don't have it, contact de
 You will also need an access to `catalog_qt_2` project. Make sure you can access it.
 
 ```
-> git clone https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+> git clone --single-branch https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
 ```
 
 ## Make sure you can access demonstrator-dashboard
 
 Demonstrator-Dashboard is a UI part of the whole solution. It is hosted on gitlab as a separate project. Make sure to ask for an access to this project and double check whether you can get the source code or not.
 
+The most recent codes are on branch `psnc/develop`.
+
 ```
-> git clone https://gitlab.com/fair-for-fusion/demonstrator-dashboard
+> git clone --single-branch --branch psnc/develop  https://gitlab.com/fair-for-fusion/demonstrator-dashboard
 ```
 
 ## Make sure you can access imas-inotify project
@@ -57,7 +61,7 @@ Demonstrator-Dashboard is a UI part of the whole solution. It is hosted on gitla
 This repository is publicly available. All you have to do, is to double check whether you can clone it
 
 ```
-> git clone https://github.com/tzok/imas-inotify.git
+> git clone --single-branch https://github.com/tzok/imas-inotify.git
 ```
 
 ***
