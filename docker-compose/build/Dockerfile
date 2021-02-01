@@ -35,10 +35,13 @@ RUN useradd --create-home --shell /bin/bash imas && \
 FROM base AS server
 
 COPY files/server.sh /server.sh
-COPY files/catalog_qt_2.patch /tmp/catalog_qt_2.patch
+RUN  mkdir /tmp/server
+COPY files/server/application.properties.patch /tmp/server/application.properties.patch
+COPY files/server/application.properties.overwrite /tmp/server/application.properties.overwrite
 
-RUN patch -p0 < /tmp/catalog_qt_2.patch && \
-    mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
+RUN patch -p0 < /tmp/server/application.properties.patch
+RUN if [ `head -1 /tmp/server/application.properties.overwrite | grep '# Intentionally left empty' | wc -l` -eq 0 ]; then cp /tmp/server/application.properties.overwrite /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties; fi
+RUN mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
 
 CMD ["/server.sh"]
 

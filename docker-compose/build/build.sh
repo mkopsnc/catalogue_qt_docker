@@ -1,9 +1,9 @@
 #! /bin/bash
-CATALOGQT_BRANCH=v1.4-20201103
-DASHBOARD_BRANCH=2020.11.03
-IMAS_INOTIFY_BRANCH=0.5.2-20201103
+CATALOGQT_BRANCH=develop
+DASHBOARD_BRANCH=psnc/develop
+IMAS_INOTIFY_BRANCH=develop
 
-DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge6.eufus.eu/git/catalog_qt_2"
+DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge-next.eufus.eu/git/catalog_qt_2"
 DEFAULT_DASHBOARD_REPO="--single-branch --branch ${DASHBOARD_BRANCH} https://gitlab.com/fair-for-fusion/demonstrator-dashboard"
 DEFAULT_IMAS_INOTIFY_REPO="--single-branch --branch ${IMAS_INOTIFY_BRANCH} https://github.com/tzok/imas-inotify"
 
@@ -35,38 +35,39 @@ function helpexit {
   exit 1
 }
 
-options=$(getopt --alternative --options h --longoptions force,help,no-cache,catalogqt-repo:,dashboard-repo:,imas-inotify-repo: -- "$@")
-eval set -- "${options}"
-
-while :; do
-    case $1 in
-        --catalogqt-repo)
-            CATALOGQT_REPO="$2"
-            shift 2
-            ;;
-        --dashboard-repo)
-            DASHBOARD_REPO="$2"
-            shift 2
-            ;;
-        --imas-inotify-repo)
-            IMAS_INOTIFY_REPO="$2"
-            shift 2
-            ;;
-        -h|--help)
-            helpexit
-            ;;
-        --force)
-            FORCE=1
-            shift
-            ;;
-        --no-cache)
-            BUILD_ARGS=--no-cache
-            shift
-            ;;
-        --)
-            break
-            ;;
-    esac
+for i in "$@"
+do
+case $i in
+    --catalogqt-repo=*)
+      CATALOGQT_REPO="${i#*=}"
+      shift # go to next arg=val
+      ;;
+    --dashboard-repo=*)
+      DASHBOARD_REPO="${i#*=}"
+      shift # go to next arg=val
+      ;;
+    --imas-inotify-repo=*)
+      IMAS_INOTIFY_REPO="${i#*=}"
+      shift # go to next arg=val
+      ;;
+    -h)
+      helpexit
+      ;;
+    --help)
+      helpexit
+      ;;
+    --force)
+      FORCE=1
+      shift
+      ;;
+    --no-cache)
+      BUILD_ARGS=--no-cache
+      shift
+      ;;
+    *)
+      echo "Unknow argument: $i"
+      ;;
+esac
 done
 
 CATALOGQT_REPO="${CATALOGQT_REPO:-$DEFAULT_CATALOGQT_REPO}"
