@@ -38,9 +38,11 @@ COPY files/server.sh /server.sh
 RUN  mkdir /tmp/server
 COPY files/server/application.properties.patch /tmp/server/application.properties.patch
 COPY files/server/application.properties.overwrite /tmp/server/application.properties.overwrite
+COPY files/server/url.properties.overwrite /tmp/server/url.properties.overwrite
 
 RUN patch -p0 < /tmp/server/application.properties.patch
 RUN if [ `head -1 /tmp/server/application.properties.overwrite | grep '# Intentionally left empty' | wc -l` -eq 0 ]; then cp /tmp/server/application.properties.overwrite /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties; fi
+RUN if [ `head -1 /tmp/server/url.properties.overwrite | grep '# Intentionally left empty' | wc -l` -eq 0 ]; then cp /tmp/server/url.properties.overwrite /catalog_qt_2/server/catalog-ws-server/src/main/resources/url.properties; fi
 RUN mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
 
 CMD ["/server.sh"]

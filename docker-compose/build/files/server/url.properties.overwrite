@@ -1,0 +1,5 @@
+# Intentionally left empty
+#
+#
+# If you have to define custom rules of endpoint authorization
+# you can drop your url.properties file here
