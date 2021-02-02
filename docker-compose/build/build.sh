@@ -3,7 +3,7 @@ CATALOGQT_BRANCH=v1.4-20201103
 DASHBOARD_BRANCH=2020.11.03
 IMAS_INOTIFY_BRANCH=0.5.2-20201103
 
-DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge6.eufus.eu/git/catalog_qt_2"
+DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge-next.eufus.eu/git/catalog_qt_2"
 DEFAULT_DASHBOARD_REPO="--single-branch --branch ${DASHBOARD_BRANCH} https://gitlab.com/fair-for-fusion/demonstrator-dashboard"
 DEFAULT_IMAS_INOTIFY_REPO="--single-branch --branch ${IMAS_INOTIFY_BRANCH} https://github.com/tzok/imas-inotify"
 
