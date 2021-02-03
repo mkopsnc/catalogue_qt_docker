@@ -27,12 +27,12 @@ pipeline {
                         git branch: 'master', credentialsId: 'catalog-qt-credentials', url: 'https://gforge-next.eufus.eu/git/catalog_qt_2'
                     }
                     script{
-                        docker.build('catalogqt')
-                        docker.build('catalogqt/updateprocess', '--target updateprocess')
-                        docker.build('catalogqt/server', '--target server')
-                        docker.build('catalogqt/db', '--target db')
-                        docker.build('catalogqt/inotify', '--target inotify')
-                        docker.build('catalogqt/dashboard', '--target dashboard')
+                        docker.build('catalogqt', '--no-cache .')
+                        docker.build('catalogqt/updateprocess', '--target updateprocess .')
+                        docker.build('catalogqt/server', '--target server .')
+                        docker.build('catalogqt/db', '--target db .')
+                        docker.build('catalogqt/inotify', '--target inotify .')
+                        docker.build('catalogqt/dashboard', '--target dashboard .')
 
                     }
                 }
