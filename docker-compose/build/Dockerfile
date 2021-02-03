@@ -16,8 +16,12 @@ COPY --from=ual /tmp/20-variables.sql /docker-entrypoint-initdb.d/20-variables.s
 
 FROM imas/ual AS base
 
-RUN apt-get update -y && \
-    apt-get install -y maven && \
+RUN apt-get update -y
+RUN apt-get install -y default-jdk
+
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+
+RUN apt-get install -y maven && \
     rm -rf /var/lib/apt/lists
 
 COPY catalog_qt_2 /catalog_qt_2
