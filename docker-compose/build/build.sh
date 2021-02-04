@@ -38,29 +38,29 @@ function helpexit {
 for i in "$@"
 do
 case $i in
-    --catalogqt-repo=*)
+    -catalogqt-repo=*)
       CATALOGQT_REPO="${i#*=}"
       shift # go to next arg=val
       ;;
-    --dashboard-repo=*)
+    -dashboard-repo=*)
       DASHBOARD_REPO="${i#*=}"
       shift # go to next arg=val
       ;;
-    --imas-inotify-repo=*)
+    -imas-inotify-repo=*)
       IMAS_INOTIFY_REPO="${i#*=}"
       shift # go to next arg=val
       ;;
     -h)
       helpexit
       ;;
-    --help)
+    -help)
       helpexit
       ;;
-    --force)
+    -force)
       FORCE=1
       shift
       ;;
-    --no-cache)
+    -no-cache)
       BUILD_ARGS=--no-cache
       shift
       ;;
