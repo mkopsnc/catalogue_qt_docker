@@ -18,6 +18,7 @@ FROM imas/ual AS base
 
 RUN apt-get update -y
 RUN apt-get install -y default-jdk
+RUN apt-get install -y netcat
 
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 

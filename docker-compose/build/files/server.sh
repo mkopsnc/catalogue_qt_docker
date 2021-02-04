@@ -1,7 +1,8 @@
 #!/bin/bash
 while :; do
     echo 'Trying to connect to db:3306'
-    curl -s -o /dev/null db:3306
+    nc -z -w1 db 3306
+#    curl -s -o /dev/null db:3306
     if [[ $? -eq 0 ]]; then
         break
     fi
