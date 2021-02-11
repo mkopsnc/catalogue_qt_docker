@@ -9,4 +9,11 @@ while :; do
 done
 
 cd /catalog_qt_2/server/catalog-ws-server/
-exec mvn spring-boot:run
+
+if [ -z "$DEBUG" ]; then
+    exec mvn spring-boot:run
+  else
+    echo "======RUNNING SERVER IN DEBUG MODE======"
+    mvn install -DskipTests
+    exec java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /root/.m2/repository/pl/psnc/catalog/catalog-ws-server/1.0.0-SNAPSHOT/catalog-ws-server-1.0.0-SNAPSHOT.jar
+fi
