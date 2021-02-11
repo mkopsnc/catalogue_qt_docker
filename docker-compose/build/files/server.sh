@@ -15,5 +15,5 @@ if [ -z "$DEBUG" ]; then
   else
     echo "======RUNNING SERVER IN DEBUG MODE======"
     mvn install -DskipTests
-    exec java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /root/.m2/repository/pl/psnc/catalog/catalog-ws-server/1.0.0-SNAPSHOT/catalog-ws-server-1.0.0-SNAPSHOT.jar
+    exec java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./target/catalog-ws-server-1.0.0-SNAPSHOT.jar
 fi
