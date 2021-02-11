@@ -51,6 +51,13 @@ ADD init.d/catalogqt /etc/init.d/catalogqt
 ADD init.d/updateprocess /etc/init.d/updateprocess
 RUN cp support-files/mysql.server /etc/init.d/mysql
 
+# Startup script
+COPY scripts/compile_plugins.sh /opt/compile_plugins.sh
+RUN chmod +x /opt/compile_plugins.sh
+
+# application.properties.overwrite
+COPY files/server/application.properties.overwrite /tmp/server/application.properties.overwrite
+
 RUN chmod +x /etc/init.d/catalogqt
 RUN chmod +x /etc/init.d/updateprocess
 RUN chmod +x /etc/init.d/mysql
@@ -76,28 +83,33 @@ RUN tar xf catalog_qt_2.tar
 
 # We have to build commons project so we can use it inside server and client parts
 WORKDIR /home/imas/opt/catalog_qt_2/common/catalog-ws-common
-RUN mvn install -DskipTests
-
-# We have to build imas-feeder project so we can use it inside server and client parts
-# IMAS Feeder requires IMAS
-WORKDIR /home/imas/opt/catalog_qt_2/plugin/imas-feeder-plugin
-RUN mkdir -p /home/imas/opt/catalog_qt_2/plugin/imas-feeder-plugin/local-maven-repo
+RUN mkdir -p /home/imas/opt/catalog_qt_2/common/catalog-ws-common/local-maven-repo
 RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=`ls -1 /opt/imas/core/IMAS/*/jar/imas.jar | head -1` -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
 
 RUN mvn install -DskipTests
 
+# We have to build imas-feeder project so we can use it inside server and client parts
+# IMAS Feeder requires IMAS
+RUN /opt/compile_plugins.sh
+
 # We can build JAR file for client application
 WORKDIR /home/imas/opt/catalog_qt_2/client/catalog-ws-client
+RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
 
 # Local repo will contain two JAR files: imas and common
-#RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
-#RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/imas/core/IMAS/3.28.1-4.8.1/jar/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
+RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
+RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=`ls -1 /opt/imas/core/IMAS/*/jar/imas.jar | head -1` -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
+RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/opt/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
 
 # Finally, we can build client
 RUN mvn install -DskipTests
 
 # The same goes for server. We have to make sure that common is loaded inside server's local directory
 WORKDIR /home/imas/opt/catalog_qt_2/server/catalog-ws-server
+
+# In case of the server, we have to make sure we don't have new application.properties file
+RUN if [ `head -1 /tmp/server/application.properties.overwrite | grep '# Intentionally left empty' | wc -l` -eq 0 ]; then cp /tmp/server/application.properties.overwrite /home/imas/opt/catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties; fi
+
 #RUN mkdir -p /home/imas/opt/catalog_qt_2/server/catalog-ws-server/local-maven-repo
 RUN mvn compile -DskipTests
 
