@@ -28,18 +28,32 @@ pipeline {
                     }
                     script{
                         docker.build('catalogqt', '--no-cache .')
-                        def updateprocessImage = docker.build('catalogqt/updateprocess', '--target updateprocess .')
+                        docker.build('catalogqt/updateprocess', '--target updateprocess .')
                         sh 'docker tag catalogqt/updateprocess registry.apps.paas-dev.psnc.pl/catalog-qt/updateprocess'
-                        def serverImage = docker.build('catalogqt/server', '--target server .')
+                        docker.build('catalogqt/server', '--target server .')
                         sh 'docker tag catalogqt/server registry.apps.paas-dev.psnc.pl/catalog-qt/server'
-                        def dbImage = docker.build('catalogqt/db', '--target db .')
+                        docker.build('catalogqt/db', '--target db .')
                         sh 'docker tag catalogqt/db registry.apps.paas-dev.psnc.pl/catalog-qt/db'
-                        def inotifyImage = docker.build('catalogqt/inotify', '--target inotify .')
-                        sh 'docker tag catalogqt/inotiy registry.apps.paas-dev.psnc.pl/catalog-qt/inotify'
-                        def dashboardImage = docker.build('catalogqt/dashboard', '--target dashboard .')
+                        docker.build('catalogqt/inotify', '--target inotify .')
+                        sh 'docker tag catalogqt/inotify registry.apps.paas-dev.psnc.pl/catalog-qt/inotify'
+                        docker.build('catalogqt/dashboard', '--target dashboard .')
                         sh 'docker tag catalogqt/dashboard registry.apps.paas-dev.psnc.pl/catalog-qt/dashboard'
                     }
+                }
+            }
+        }
 
+        stage('Push Catalog QT to image registry') {
+            steps {
+                script {
+                    openshift.withCluster(clusterName:'https://console.paas-dev.psnc.pl/', credential:'oc-credentials') {
+                        sh 'docker login -u $(oc whoami) -p $(oc whoami -t) https://registry.apps.paas-dev.psnc.pl/'
+                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/updateprocess'
+                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/server'
+                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/db'
+                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/inotify'
+                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/dashboard'
+                    }
                 }
             }
         }
