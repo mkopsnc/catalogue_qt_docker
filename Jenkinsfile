@@ -28,13 +28,18 @@ pipeline {
                     }
                     script{
                         docker.build('catalogqt', '--no-cache .')
-                        docker.build('catalogqt/updateprocess', '--target updateprocess .')
-                        docker.build('catalogqt/server', '--target server .')
-                        docker.build('catalogqt/db', '--target db .')
-                        docker.build('catalogqt/inotify', '--target inotify .')
-                        docker.build('catalogqt/dashboard', '--target dashboard .')
-
+                        def updateprocessImage = docker.build('catalogqt/updateprocess', '--target updateprocess .')
+                        sh 'docker tag catalogqt/updateprocess registry.apps.paas-dev.psnc.pl/catalog-qt/updateprocess'
+                        def serverImage = docker.build('catalogqt/server', '--target server .')
+                        sh 'docker tag catalogqt/server registry.apps.paas-dev.psnc.pl/catalog-qt/server'
+                        def dbImage = docker.build('catalogqt/db', '--target db .')
+                        sh 'docker tag catalogqt/db registry.apps.paas-dev.psnc.pl/catalog-qt/db'
+                        def inotifyImage = docker.build('catalogqt/inotify', '--target inotify .')
+                        sh 'docker tag catalogqt/inotiy registry.apps.paas-dev.psnc.pl/catalog-qt/inotify'
+                        def dashboardImage = docker.build('catalogqt/dashboard', '--target dashboard .')
+                        sh 'docker tag catalogqt/dashboard registry.apps.paas-dev.psnc.pl/catalog-qt/dashboard'
                     }
+
                 }
             }
         }
