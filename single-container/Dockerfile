@@ -5,7 +5,7 @@ LABEL description="Docker based installation of Catalogue QT"
 
 USER root
 
-RUN apt-get update -y
+RUN apt-get update  -y
 RUN apt-get install -y libaio1
 RUN apt-get install -y libtinfo5
 RUN apt-get install -y wget
@@ -52,12 +52,6 @@ ADD init.d/updateprocess /etc/init.d/updateprocess
 RUN cp support-files/mysql.server /etc/init.d/mysql
 
 # Startup script
-COPY scripts/compile_plugins.sh /opt/compile_plugins.sh
-RUN chmod +x /opt/compile_plugins.sh
-
-# application.properties.overwrite
-COPY files/server/application.properties.overwrite /tmp/server/application.properties.overwrite
-
 RUN chmod +x /etc/init.d/catalogqt
 RUN chmod +x /etc/init.d/updateprocess
 RUN chmod +x /etc/init.d/mysql
@@ -67,9 +61,9 @@ RUN update-rc.d mysql defaults
 RUN update-rc.d catalogqt defaults
 RUN update-rc.d updateprocess defaults
 
-# Startup script
-COPY scripts/run.sh /opt/run.sh
-RUN chmod +x /opt/run.sh
+
+# Copy *properties* into Docker so we can overwrite server settings
+COPY files/server/*properties* /tmp/server/
 
 # Now, we have to prepare whole structure of source code
 USER imas
@@ -81,37 +75,12 @@ COPY external/catalog_qt_2.tar /home/imas/opt/catalog_qt_2.tar
 WORKDIR /home/imas/opt
 RUN tar xf catalog_qt_2.tar
 
-# We have to build commons project so we can use it inside server and client parts
-WORKDIR /home/imas/opt/catalog_qt_2/common/catalog-ws-common
-RUN mkdir -p /home/imas/opt/catalog_qt_2/common/catalog-ws-common/local-maven-repo
-RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=`ls -1 /opt/imas/core/IMAS/*/jar/imas.jar | head -1` -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
-
-RUN mvn install -DskipTests
-
-# We have to build imas-feeder project so we can use it inside server and client parts
-# IMAS Feeder requires IMAS
-RUN /opt/compile_plugins.sh
-
-# We can build JAR file for client application
-WORKDIR /home/imas/opt/catalog_qt_2/client/catalog-ws-client
-RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
-
-# Local repo will contain two JAR files: imas and common
-RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
-RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=`ls -1 /opt/imas/core/IMAS/*/jar/imas.jar | head -1` -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
-RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/opt/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
-
-# Finally, we can build client
-RUN mvn install -DskipTests
-
-# The same goes for server. We have to make sure that common is loaded inside server's local directory
-WORKDIR /home/imas/opt/catalog_qt_2/server/catalog-ws-server
-
-# In case of the server, we have to make sure we don't have new application.properties file
-RUN if [ `head -1 /tmp/server/application.properties.overwrite | grep '# Intentionally left empty' | wc -l` -eq 0 ]; then cp /tmp/server/application.properties.overwrite /home/imas/opt/catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties; fi
-
-#RUN mkdir -p /home/imas/opt/catalog_qt_2/server/catalog-ws-server/local-maven-repo
-RUN mvn compile -DskipTests
+# Build Java codes
+# Prepare compilation script for Java based codes
+# and run it
+COPY --chown=imas scripts/compile.sh /home/imas/opt/compile.sh
+RUN chmod +x /home/imas/opt/compile.sh
+RUN /home/imas/opt/compile.sh
 
 USER root
 
@@ -139,10 +108,11 @@ USER imas
 COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 
-CMD /opt/run.sh
-
 USER root
 
+COPY scripts/run.sh /opt/run.sh
+RUN chmod +x /opt/run.sh
+CMD /opt/run.sh
 
 # Install imas-inotify and dependencies
 ARG INOTIFY_TAG
