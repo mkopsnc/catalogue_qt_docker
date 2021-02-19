@@ -61,9 +61,11 @@ RUN update-rc.d mysql defaults
 RUN update-rc.d catalogqt defaults
 RUN update-rc.d updateprocess defaults
 
-
 # Copy *properties* into Docker so we can overwrite server settings
 COPY files/server/*properties* /tmp/server/
+
+# Copy config.ini for imas-inotify, we have to alter it's settings
+COPY files/imas-inotify/* /tmp/imas-inotify/
 
 # Now, we have to prepare whole structure of source code
 USER imas
@@ -124,9 +126,17 @@ RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
 RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify
 RUN pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
 
+RUN if [ -e /tmp/imas-inotify/config.ini ]; then cp /tmp/imas-inotify/config.ini /home/imas/opt/imas-inotify/config.ini; fi
+
 # Enable imas-inotify service
 COPY init.d/imas-inotify /etc/init.d/imas-inotify
 RUN sudo update-rc.d imas-inotify defaults
+
+# TODO - move this part into imas-inotify handler
+RUN java \
+    -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
+    -keyCloakServiceLogin \
+    --realm-settings-file /home/imas/opt/catalog_qt_2/client/catalog-ws-client/src/main/resources/service-login.properties
 
 # Configure imas-inotify
 COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
