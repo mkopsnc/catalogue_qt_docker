@@ -34,8 +34,17 @@ while [ $loop == 1 ]; do
 
 done
 
-java -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
+UPDATE_PROCESS_JDWP=""
+
+if [ ! -z "$DEBUG_UPDATE_PROCESS" ]; then
+  if [[ "${DEBUG_UPDATE_PROCESS}" == "true" ]]; then
+    UPDATE_PROCESS_JDWP="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:32888"
+  fi
+fi
+
+java ${UPDATE_PROCESS_JDWP} -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
   -startUpdateProcess \
   --url http://127.0.0.1:8080 \
   --scheme mdsplus \
   --slice-limit 100
+

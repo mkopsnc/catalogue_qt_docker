@@ -110,6 +110,9 @@ USER imas
 COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 
+COPY --chown=imas scripts/catalogqt.sh /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
+RUN chmod +x /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
+
 USER root
 
 COPY scripts/run.sh /opt/run.sh

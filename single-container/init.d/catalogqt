@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/home/imas/opt/catalog_qt_2/server/catalog-ws-server"
-cmd="mvn spring-boot:run"
+cmd="catalogqt.sh"
 user="imas"
 
 name=`basename $0`
