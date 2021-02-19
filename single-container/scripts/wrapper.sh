@@ -1,12 +1,15 @@
 #!/bin/bash
 
-export LD_LIBRARY_PATH=/home/imas/imas/core/IMAS/3.28.1-4.8.1/lib
-export CLASSPATH=/home/imas/imas/core/IMAS/3.28.1-4.8.1/jar/imas.jar:/usr/share/java/saxon9he.jar
-export IMAS_PREFIX=/home/imas/imas/core/IMAS/3.28.1-4.8.1
-export IMAS_VERSION=3.28.1
+DD_VER=`ls -1 /opt/imas/core/IMAS | head -1 | cut -f1 -d'-'`
+AL_VER=`ls -1 /opt/imas/core/IMAS | head -1 | cut -f2 -d'-'`
+
+export LD_LIBRARY_PATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/lib
+export CLASSPATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/jar/imas.jar:/usr/share/java/saxon9he.jar
+export IMAS_PREFIX=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}
+export IMAS_VERSION=${DD_VER}
 export IMAS_HOME=/home/imas/imas
-export ids_path=/home/imas/imas/core/IMAS/3.28.1-4.8.1/models/mdsplus
-export UAL_VERSION=4.8.1
+export ids_path=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/models/mdsplus
+export UAL_VERSION=${AL_VER}
 
 loop=1
 tries=10

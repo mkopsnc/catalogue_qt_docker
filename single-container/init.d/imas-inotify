@@ -11,7 +11,7 @@
 
 dir="/home/imas/opt/imas-inotify"
 cmd="python imas-inotify.py"
-user="imas"
+user="root"
 
 name=`basename $0`
 pid_file="/var/run/$name.pid"

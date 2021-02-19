@@ -16,12 +16,6 @@ cat << EOF
 
         to browse description of RESTful API.
 
-        You can also visit
-
-        http://localhost:8082
-
-        to browse Demonstrator Dashboard.
-
         You can also use Catalog QT CLI application
         to perform calls to the API.
 
@@ -30,7 +24,6 @@ cat << EOF
         - MySQL
         - Catalog QT WS
         - Catalog QT Update Process
-        - Demonstrator Dashboard
         - inotify based trigger for data imports
  
         ------------------------------------------------
@@ -52,7 +45,6 @@ sudo /etc/init.d/mysql start
 sudo /etc/init.d/catalogqt start
 sudo /etc/init.d/updateprocess start
 sudo /etc/init.d/imas-inotify start
-sudo /etc/init.d/dashboard start
 
 /bin/bash
 

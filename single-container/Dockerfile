@@ -1,13 +1,22 @@
-FROM imas/fc2k
+FROM imas/ual
 
 LABEL author="michal.owsiak@man.poznan.pl"
 LABEL description="Docker based installation of Catalogue QT"
 
 USER root
 
+RUN apt-get update  -y
 RUN apt-get install -y libaio1
+RUN apt-get install -y libtinfo5
 RUN apt-get install -y wget
 RUN apt-get install -y maven
+RUN apt-get install -y default-jdk
+RUN apt-get install -y netcat
+
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+
+RUN useradd --create-home --shell /bin/bash imas && \
+    su - imas sh -c 'MODULEPATH=/opt/imas/etc/modulefiles module load IMAS; mkdir -p /home/imas/public/imasdb; command imasdb test'
 
 # Installation of MySQL from binary distribution
 RUN mkdir -p /opt/packages/
@@ -42,6 +51,7 @@ ADD init.d/catalogqt /etc/init.d/catalogqt
 ADD init.d/updateprocess /etc/init.d/updateprocess
 RUN cp support-files/mysql.server /etc/init.d/mysql
 
+# Startup script
 RUN chmod +x /etc/init.d/catalogqt
 RUN chmod +x /etc/init.d/updateprocess
 RUN chmod +x /etc/init.d/mysql
@@ -51,9 +61,11 @@ RUN update-rc.d mysql defaults
 RUN update-rc.d catalogqt defaults
 RUN update-rc.d updateprocess defaults
 
-# Startup script
-COPY scripts/run.sh /opt/run.sh
-RUN chmod +x /opt/run.sh
+# Copy *properties* into Docker so we can overwrite server settings
+COPY files/server/*properties* /tmp/server/
+
+# Copy config.ini for imas-inotify, we have to alter it's settings
+COPY files/imas-inotify/* /tmp/imas-inotify/
 
 # Now, we have to prepare whole structure of source code
 USER imas
@@ -65,32 +77,19 @@ COPY external/catalog_qt_2.tar /home/imas/opt/catalog_qt_2.tar
 WORKDIR /home/imas/opt
 RUN tar xf catalog_qt_2.tar
 
-# We have to build commons project so we can use it inside server and client parts
-WORKDIR /home/imas/opt/catalog_qt_2/common/catalog-ws-common
-RUN mvn package
-RUN mvn install
-
-# We can build JAR file for client application
-WORKDIR /home/imas/opt/catalog_qt_2/client/catalog-ws-client
-
-# Local repo will contain two JAR files: imas and common
-RUN mkdir -p /home/imas/opt/catalog_qt_2/client/catalog-ws-client/local-maven-repo
-RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=/home/imas/imas/core/IMAS/3.28.1-4.8.1/jar/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DlocalRepositoryPath=`pwd`/local-maven-repo
-
-# Finally, we can build client
-RUN mvn install -DskipTests
-
-# The same goes for server. We have to make sure that common is loaded inside server's local directory
-WORKDIR /home/imas/opt/catalog_qt_2/server/catalog-ws-server
-RUN mkdir -p /home/imas/opt/catalog_qt_2/server/catalog-ws-server/local-maven-repo
-RUN mvn compile -DskipTests
+# Build Java codes
+# Prepare compilation script for Java based codes
+# and run it
+COPY --chown=imas scripts/compile.sh /home/imas/opt/compile.sh
+RUN chmod +x /home/imas/opt/compile.sh
+RUN /home/imas/opt/compile.sh
 
 USER root
 
 # XLST - transformation file that generates SQL queries for variables is located here:
 # /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl
 
-RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl $IMAS_PREFIX/include/IDSDef.xml > /tmp/variables
+RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl `ls -1 /opt/imas/core/IMAS/*/include/IDSDef.xml | head -1` > /tmp/variables
 
 # We have to prepare database for Catalog QT.
 # Schema is located here: /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql
@@ -111,8 +110,11 @@ USER imas
 COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 
-CMD /opt/run.sh
+USER root
 
+COPY scripts/run.sh /opt/run.sh
+RUN chmod +x /opt/run.sh
+CMD /opt/run.sh
 
 # Install imas-inotify and dependencies
 ARG INOTIFY_TAG
@@ -121,34 +123,21 @@ ENV INOTIFY_TAG_BASH=${INOTIFY_TAG:-master}
 RUN echo "INOTIFY_TAG:      ${INOTIFY_TAG}"
 RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
 
-RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify \
-    && sudo pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
+RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify
+RUN pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
+
+RUN if [ -e /tmp/imas-inotify/config.ini ]; then cp /tmp/imas-inotify/config.ini /home/imas/opt/imas-inotify/config.ini; fi
 
 # Enable imas-inotify service
 COPY init.d/imas-inotify /etc/init.d/imas-inotify
 RUN sudo update-rc.d imas-inotify defaults
 
+# TODO - move this part into imas-inotify handler
+RUN java \
+    -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
+    -keyCloakServiceLogin \
+    --realm-settings-file /home/imas/opt/catalog_qt_2/client/catalog-ws-client/src/main/resources/service-login.properties
+
 # Configure imas-inotify
 COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
 
-# Setting up Demonstrator Dashboard
-# Making space for webapp
-COPY --chown=imas:imas external/demonstrator-dashboard.tar /home/imas/opt/
-WORKDIR /home/imas/opt/
-RUN tar xf demonstrator-dashboard.tar
-COPY --chown=imas:imas external/dashboard-secrets.json /home/imas/opt/demonstrator-dashboard/dashboard/settings/secrets.json
-
-# Install requirements
-RUN python3 -m pip install -r demonstrator-dashboard/requirements.txt
-
-COPY --chown=imas:imas scripts/dashboard-wrapper.sh /home/imas/opt/demonstrator-dashboard/dashboard-wrapper.sh
-RUN chmod +x /home/imas/opt/demonstrator-dashboard/dashboard-wrapper.sh
-
-
-# Enable dashboard service
-USER root
-COPY init.d/dashboard /etc/init.d/dashboard
-RUN chmod +x /etc/init.d/dashboard
-RUN update-rc.d dashboard defaults
-
-USER imas
