@@ -4,14 +4,8 @@ java \
     -keyCloakServiceLogin \
     --realm-settings-file /docker-entrypoint-properties.d/service-login.properties
 
-while :; do
-    echo 'Trying to connect to server:8080...'
-    curl -s -o /dev/null server:8080
-    if [[ $? -eq 0 ]]; then
-        break
-    fi
-    sleep 3
-done
-
 cd imas-inotify
+
+wait-for-it server:8080 --timeout=0
+
 exec ./imas-inotify.py --verbose

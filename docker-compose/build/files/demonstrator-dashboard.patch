@@ -1,8 +1,0 @@
---- demonstrator-dashboard/db_api/utils/services_constants.py.orig	2020-10-28 13:52:55.917243670 +0100
-+++ demonstrator-dashboard/db_api/utils/services_constants.py	2020-10-28 13:53:06.510649848 +0100
-@@ -1,4 +1,4 @@
--SERVER_IP = 'catalog.eufus.eu'
-+SERVER_IP = 'server'
- SERVER_PORT = '8080'
- API_ROOT = f'http://{SERVER_IP}:{SERVER_PORT}/'
- 
