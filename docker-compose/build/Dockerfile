@@ -7,7 +7,7 @@ RUN echo 'USE itm_catalog_qt' > /tmp/20-variables.sql && \
 
 ################################################################################
 
-FROM mysql AS db
+FROM mariadb AS db
 
 COPY catalog_qt_2/sql/schema/catalog_qt_db.sql /docker-entrypoint-initdb.d/10-schema.sql
 COPY --from=ual /tmp/20-variables.sql /docker-entrypoint-initdb.d/20-variables.sql
@@ -16,21 +16,22 @@ COPY --from=ual /tmp/20-variables.sql /docker-entrypoint-initdb.d/20-variables.s
 
 FROM imas/ual AS base
 
-RUN apt-get update -y
-RUN apt-get install -y default-jdk
-RUN apt-get install -y netcat
+COPY catalog_qt_2 /catalog_qt_2
 
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 
-RUN apt-get install -y maven && \
-    rm -rf /var/lib/apt/lists
-
-COPY catalog_qt_2 /catalog_qt_2
+RUN apt-get update && \
+    apt-get install -y \
+        default-jdk \
+        maven \
+        wait-for-it && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN mvn --file /catalog_qt_2/common/catalog-ws-common/pom.xml install -DskipTests && \
     mvn install:install-file -Dfile=/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
     cp /opt/imas/core/IMAS/*/jar/imas.jar /tmp/imas.jar && \
-    mvn install:install-file -Dfile=/tmp/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar
+    mvn install:install-file -Dfile=/tmp/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
+    rm /tmp/imas.jar
 
 RUN useradd --create-home --shell /bin/bash imas && \
     su - imas sh -c 'MODULEPATH=/opt/imas/etc/modulefiles module load IMAS; mkdir -p /home/imas/public/imasdb; command imasdb test'
@@ -39,14 +40,13 @@ RUN useradd --create-home --shell /bin/bash imas && \
 
 FROM base AS server
 
-COPY files/server.sh /server.sh
-RUN  mkdir /tmp/server
-COPY files/server/*properties* /tmp/server/
+COPY files/server-override/* /tmp/server-override/
 
-RUN patch -p0 < /tmp/server/application.properties.patch
-RUN if [ -e /tmp/server/application.properties ]; then cp /tmp/server/application.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties; fi
-RUN if [ -e /tmp/server/url.properties ]; then cp /tmp/server/url.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/url.properties; fi
-RUN mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
+RUN if [ -e /tmp/server-override/application.properties ]; then cp /tmp/server-override/application.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi && \
+    if [ -e /tmp/server-override/url.properties ]; then cp /tmp/server-override/url.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi && \
+    mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
+
+COPY files/server.sh /server.sh
 
 CMD ["/server.sh"]
 
@@ -61,7 +61,6 @@ RUN mvn --file /catalog_qt_2/client/catalog-ws-client/pom.xml package -DskipTest
 FROM client AS updateprocess
 
 COPY files/updateprocess.sh /updateprocess.sh
-
 CMD ["/updateprocess.sh"]
 
 ################################################################################
@@ -69,9 +68,10 @@ CMD ["/updateprocess.sh"]
 FROM client AS inotify
 
 COPY imas-inotify /imas-inotify
-COPY files/inotify.sh /inotify.sh
 
 RUN pip3 install -r imas-inotify/requirements.txt
+
+COPY files/inotify.sh /inotify.sh
 
 CMD ["/inotify.sh"]
 
@@ -80,10 +80,16 @@ CMD ["/inotify.sh"]
 FROM python AS dashboard
 
 COPY demonstrator-dashboard /demonstrator-dashboard
-COPY files/dashboard.sh /dashboard.sh
-COPY files/demonstrator-dashboard.patch /tmp/demonstrator-dashboard.patch
+COPY files/demonstrator-dashboard-override/* /tmp/demonstrator-dashboard-override/
 
-RUN patch -p0 < /tmp/demonstrator-dashboard.patch && \
+RUN apt-get update && \
+    apt-get install -y \
+        wait-for-it && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN if [ -e /tmp/demonstrator-dashboard-override/services_constants.py ]; then cp /tmp/demonstrator-dashboard-override/services_constants.py /demonstrator-dashboard/db_api/utils/; fi && \
     pip install -r /demonstrator-dashboard/requirements.txt
+
+COPY files/dashboard.sh /dashboard.sh
 
 CMD ["/dashboard.sh"]
