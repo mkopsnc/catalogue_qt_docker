@@ -92,15 +92,28 @@ USER root
 RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl `ls -1 /opt/imas/core/IMAS/*/include/IDSDef.xml | head -1` > /tmp/variables
 
 # We have to prepare database for Catalog QT.
-# Schema is located here: /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql
-RUN echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" > /tmp/config && \
-    echo "/usr/local/mysql/bin/mysqladmin -uroot -ppassword --silent --wait=30 ping || exit 1" >> /tmp/config && \
-    echo "/usr/local/mysql/bin/mysql -uroot -ppassword < /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql" >> /tmp/config && \
-    echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < /tmp/variables" >> /tmp/config && \
-    echo "/usr/local/mysql/bin/mysqladmin shutdown -u root -ppassword --wait=30 ping || exit 1" >> /tmp/config && \
-    bash /tmp/config && \
-    rm -f /tmp/config
 
+RUN echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" > /tmp/config && \  
+   echo "/usr/local/mysql/bin/mysqladmin -uroot -ppassword --silent --wait=30 ping || exit 1" >> /tmp/config && \  
+   #  
+   # We prepare structure of DB, by running base script, and its alter scripts 'a_'  
+   echo "for a_sql_file in /home/imas/opt/catalog_qt_2/sql/schema/a_*" >> /tmp/config && \  
+   echo "do" >> /tmp/config && \  
+   echo "/usr/local/mysql/bin/mysql -uroot -ppassword < \$a_sql_file" >> /tmp/config && \  
+   echo "done" >> /tmp/config && \  
+   #  
+   #After creating structure od DB we have to import data, and load alter scripts for modyfing data in DB 'd_'  
+   echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < /tmp/variables" >> /tmp/config && \  
+   echo "for d_sql_file in /home/imas/opt/catalog_qt_2/sql/schema/d_*" >> /tmp/config && \  
+   echo "do" >> /tmp/config && \  
+   echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < \$d_sql_file" >> /tmp/config && \  
+   echo "done" >> /tmp/config && \  
+   #
+   # end of modyfing DB.
+   echo "/usr/local/mysql/bin/mysqladmin shutdown -u root -ppassword --wait=30 ping || exit 1" >> /tmp/config && \  
+   bash /tmp/config && \  
+   rm -f /tmp/config
+   
 # This part of Docker file is responsible for setting up services (UpdateProcess and notify service)
 
 USER imas
