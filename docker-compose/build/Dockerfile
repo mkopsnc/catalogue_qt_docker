@@ -11,7 +11,7 @@ FROM mariadb AS db
 
 COPY catalog_qt_2/sql/schema/a_001_catalog_qt_db.sql /docker-entrypoint-initdb.d/10-schema.sql
 COPY --from=ual /tmp/20-variables.sql /docker-entrypoint-initdb.d/20-variables.sql
-COPY catalog_qt_2/sql/schema/d_001_update_variables.sql /docker-entrypoint-initdb.d/20-alter_update_variables.sql
+COPY catalog_qt_2/sql/schema/d_001_update_variables.sql /docker-entrypoint-initdb.d/30-alter_update_variables.sql
 
 ################################################################################
 
