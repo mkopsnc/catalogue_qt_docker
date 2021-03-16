@@ -124,12 +124,6 @@ USER imas
 COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 
-USER root
-
-COPY scripts/run.sh /opt/run.sh
-RUN chmod +x /opt/run.sh
-CMD /opt/run.sh
-
 # Install imas-inotify and dependencies
 ARG INOTIFY_TAG
 ENV INOTIFY_TAG_BASH=${INOTIFY_TAG:-master}
@@ -138,20 +132,30 @@ RUN echo "INOTIFY_TAG:      ${INOTIFY_TAG}"
 RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
 
 RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify
-RUN pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
 
 RUN if [ -e /tmp/imas-inotify/config.ini ]; then cp /tmp/imas-inotify/config.ini /home/imas/opt/imas-inotify/config.ini; fi
 
-# Enable imas-inotify service
-COPY init.d/imas-inotify /etc/init.d/imas-inotify
-RUN sudo update-rc.d imas-inotify defaults
+# Configure imas-inotify
+COPY --chown=imas scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
 
-# TODO - move this part into imas-inotify handler
+USER root
+
+# Getting token for imas-inotify
 RUN java \
     -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
     -keyCloakServiceLogin \
     --realm-settings-file /home/imas/opt/catalog_qt_2/client/catalog-ws-client/src/main/resources/service-login.properties
 
-# Configure imas-inotify
-COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
+# Install imas-inotify dependencies
+RUN pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
+
+# Enable imas-inotify service
+COPY init.d/imas-inotify /etc/init.d/imas-inotify
+RUN  update-rc.d imas-inotify defaults
+
+# Prepare entry point script
+COPY scripts/run.sh /opt/run.sh
+RUN chmod +x /opt/run.sh
+CMD /opt/run.sh
+
 
