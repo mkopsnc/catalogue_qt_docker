@@ -2,6 +2,10 @@
 
 DD_VER=`ls -1 /opt/imas/core/IMAS | head -1 | cut -f1 -d'-'`
 AL_VER=`ls -1 /opt/imas/core/IMAS | head -1 | cut -f2 -d'-'`
+CLIENT_WS_DIR=/home/imas/opt/catalog_qt_2/client/catalog-ws-client
+CLIENT_WS_JAR=${CLIENT_WS_DIR}/target/catalogAPI.jar
+CLIENT_WS_PROPERTIES=${CLIENT_WS_DIR}/src/main/resources/service-login.properties
+
 
 export LD_LIBRARY_PATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/lib
 export CLASSPATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/jar/imas.jar:/usr/share/java/saxon9he.jar
@@ -15,7 +19,6 @@ loop=1
 tries=10
 
 while [ $loop == 1 ]; do
-
   curl -s http://localhost:8080 > /dev/null 2>&1
   retVal=$?
 
@@ -30,12 +33,15 @@ while [ $loop == 1 ]; do
   else
     loop=0
   fi
-
-
 done
 
-java -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
+java -jar ${CLIENT_WS_JAR} \
+    -keyCloakServiceLogin \
+    --realm-settings-file ${CLIENT_WS_PROPERTIES}
+
+java -jar ${CLIENT_WS_JAR} \
   -startUpdateProcess \
   --url http://127.0.0.1:8080 \
   --scheme mdsplus \
+  --run-as-service \
   --slice-limit 100
