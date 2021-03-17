@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/home/imas/opt/catalog_qt_2/server/catalog-ws-server"
-cmd="catalogqt.sh"
+cmd="/home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh"
 user="imas"
 
 name=`basename $0`

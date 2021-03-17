@@ -81,9 +81,11 @@ RUN tar xf catalog_qt_2.tar
 # Build Java codes
 # Prepare compilation script for Java based codes
 # and run it
-COPY --chown=imas scripts/compile.sh /home/imas/opt/compile.sh
-RUN chmod +x /home/imas/opt/compile.sh
-RUN /home/imas/opt/compile.sh
+# The reason for keeping this file outside of Dockerfile is that file itself is quite
+# large and, additionally, it depends on source layout.
+COPY --chown=imas scripts/compile-java-code.sh /home/imas/opt/compile-java-code.sh
+RUN chmod +x /home/imas/opt/compile-java-code.sh
+RUN /home/imas/opt/compile-java-code.sh
 
 USER root
 
@@ -121,8 +123,8 @@ USER imas
 
 # Wrapper script is a convenient way of setting up IMAS env. variables and
 # running update process
-COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
-RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
+COPY --chown=imas scripts/catalogqt-update-process.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/catalogqt-update-process.sh
+RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/catalogqt-update-process.sh
 
 COPY --chown=imas scripts/catalogqt.sh /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
 RUN chmod +x /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh

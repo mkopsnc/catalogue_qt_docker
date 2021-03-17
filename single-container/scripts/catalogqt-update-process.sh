@@ -1,11 +1,15 @@
 #!/bin/bash
 
+WRAPPER_CMD=$(readlink -m $0)
+WRAPPER_CMD_DIR=$(dirname ${WRAPPER_CMD})
+
+cd ${WRAPPER_CMD_DIR}
+
 DD_VER=`ls -1 /opt/imas/core/IMAS | head -1 | cut -f1 -d'-'`
 AL_VER=`ls -1 /opt/imas/core/IMAS | head -1 | cut -f2 -d'-'`
 CLIENT_WS_DIR=/home/imas/opt/catalog_qt_2/client/catalog-ws-client
 CLIENT_WS_JAR=${CLIENT_WS_DIR}/target/catalogAPI.jar
 CLIENT_WS_PROPERTIES=${CLIENT_WS_DIR}/src/main/resources/service-login.properties
-
 
 export LD_LIBRARY_PATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/lib
 export CLASSPATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/jar/imas.jar:/usr/share/java/saxon9he.jar

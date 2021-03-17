@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/home/imas/opt/catalog_qt_2/client/catalog-ws-client"
-cmd="/home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh"
+cmd="/home/imas/opt/catalog_qt_2/client/catalog-ws-client/catalogqt-update-process.sh"
 user="imas"
 
 name=`basename $0`

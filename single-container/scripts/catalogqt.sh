@@ -1,17 +1,12 @@
 #!/bin/bash
 
+CATALOG_QT_CMD=$(readlink -m $0)
+CATALOG_QT_CMD_DIR=$(dirname ${CATALOG_QT_CMD})
+
+cd ${CATALOG_QT_CMD_DIR}
+
 loop=1
 tries=10
-
-while :; do
-    echo 'Trying to connect to db:3306'
-    nc -z -w1 db 3306
-    
-    if [[ $? -eq 0 ]]; then
-        break
-    fi
-    sleep 3
-done
 
 while [ $loop == 1 ]; do
 
