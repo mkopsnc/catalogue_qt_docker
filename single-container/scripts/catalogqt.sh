@@ -12,6 +12,7 @@ while [ $loop == 1 ]; do
 
   echo 'Trying to connect to localhost:3396'
   nc -z -w1 localhost 3306
+  retVal=$?
 
   if [ $retVal -ne 0 ]; then
     sleep 10
