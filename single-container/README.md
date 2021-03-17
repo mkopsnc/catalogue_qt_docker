@@ -30,11 +30,9 @@ Once you have it, you can clone `catalogue_qt_docker` repository
 > tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
 
-***
-
 # Building container
 
-Once both projects are in place, you can build the container.
+Once `Catalog QT 2` is in place, you can build the container.
 
 ```
 > docker build -t catalogqt .
