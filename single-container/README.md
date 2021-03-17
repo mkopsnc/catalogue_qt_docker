@@ -139,6 +139,79 @@ Once you have a place for local data storage you can run Docker following way
   --name catalogqt_test -t catalogqt
 ```
 
+# Running in debug mode
+
+Inside container there are thress Java process that can be attached to:
+
+- catalogAPI - UpdateProcess,
+- catalogAPI - AddRequest (triggered by imas-inotify),
+- Spring Boot based Web Services.
+
+In order to make it possible to debug these processe, there are few things you have to do
+
+## Enabling debug mode for components
+
+Make sure to run Docker container such way it exposes ports used for debugging
+
+```
+> docker run -i \
+  -p 8080:8080 \
+  -p 3306:3306 \
+  -p 33060:33060 \
+  -p 32887:32887 \
+  -p 32888:32888 \
+  -p 32889:32889 \
+  -v `pwd`/imasdb:/home/imas/public/imasdb \
+  -v `pwd`/mysql_storage:/usr/local/mysql/mysql_storage \
+  --name catalogqt_test -t catalogqt
+```
+
+Ports (for remote debugger) were arbitrary choosen:
+
+- `32887` - catalogAPI - AddRequest
+- `32888` - catalogAPI - UpdateProcess
+- `32889` - Spring Boot application
+
+### Enabling debug for AddRequest
+
+In order to enable debug mode for `AddRequest` code make sure to updated file
+
+```
+files
+`-- imas-inotify
+    `-- config.ini
+```
+
+Uncomment the following line
+
+```
+; debug = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:32887'
+```
+
+Once uncommented, you will be able to attach using port `32887` and debug all calls to `catalogAPI` executed in `AddRequest` mode.
+
+Note that this is a blocking action. Your container will always wait for debugger to connect whenever new data are ready for being populated.
+
+### Enabling debugger for UpdateProcess
+
+Enabling `UpdateProcess` debugging can be done by passing environment variable to container
+
+```
+-e DEBUG_UPDATE_PROCESS=true
+```
+
+Note that only value `true` is treated as proper flag value for turning on `UpdateProcess` debugger. Any other values will be skipped. Once debugger is started you will be able to attach using port `32888`.
+
+### Enabling debugger for Spring Boot based Web Services
+
+Enabling `Spring Boot` application inside Docker container you have to pass following variable while starting Docker.
+
+```
+-e DEBUG_SPRING_BOOT=true
+```
+
+Note that only value `true` is treated as proper flag value for turning on `Spring Boot` debugger. Any other values will be skipped. Once debugger is started you will be able to attach using port `32889`.
+
 # Known limitations
 
 Note that this container should be used only for research purposes. You need access to Catalogue QT v.2.

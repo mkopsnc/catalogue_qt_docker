@@ -124,6 +124,9 @@ USER imas
 COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
 
+COPY --chown=imas scripts/catalogqt.sh /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
+RUN chmod +x /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
+
 # Install imas-inotify and dependencies
 ARG INOTIFY_TAG
 ENV INOTIFY_TAG_BASH=${INOTIFY_TAG:-master}

@@ -39,7 +39,15 @@ java -jar ${CLIENT_WS_JAR} \
     -keyCloakServiceLogin \
     --realm-settings-file ${CLIENT_WS_PROPERTIES}
 
-java -jar ${CLIENT_WS_JAR} \
+UPDATE_PROCESS_JDWP=""
+
+if [ ! -z "$DEBUG_UPDATE_PROCESS" ]; then
+  if [[ "${DEBUG_UPDATE_PROCESS}" == "true" ]]; then
+    UPDATE_PROCESS_JDWP="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:32888"
+  fi
+fi
+
+java ${UPDATE_PROCESS_JDWP} -jar ${CLIENT_WS_JAR} \
   -startUpdateProcess \
   --url http://127.0.0.1:8080 \
   --scheme mdsplus \
