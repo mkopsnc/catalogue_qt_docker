@@ -23,10 +23,11 @@ RUN mkdir -p /opt/packages/
 WORKDIR /opt/packages/
 
 # Get the package and put the content in proper location
-RUN wget -q https://cdn.mysql.com/archives/mysql-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
-RUN tar -xf mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 RUN mkdir -p /usr/local/mysql
-RUN mv mysql-8.0.20-linux-glibc2.12-x86_64/* /usr/local/mysql
+RUN wget -q https://cdn.mysql.com/archives/mysql-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
+RUN tar -xf mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz -C /usr/local/mysql --strip-components 1
+RUN rm mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
+#RUN mv mysql-8.0.20-linux-glibc2.12-x86_64/* /usr/local/mysql
 
 # MySQL will be run as user mysql
 RUN groupadd mysql
@@ -80,9 +81,11 @@ RUN tar xf catalog_qt_2.tar
 # Build Java codes
 # Prepare compilation script for Java based codes
 # and run it
-COPY --chown=imas scripts/compile.sh /home/imas/opt/compile.sh
-RUN chmod +x /home/imas/opt/compile.sh
-RUN /home/imas/opt/compile.sh
+# The reason for keeping this file outside of Dockerfile is that file itself is quite
+# large and, additionally, it depends on source layout.
+COPY --chown=imas scripts/compile-java-code.sh /home/imas/opt/compile-java-code.sh
+RUN chmod +x /home/imas/opt/compile-java-code.sh
+RUN /home/imas/opt/compile-java-code.sh
 
 USER root
 
@@ -92,29 +95,39 @@ USER root
 RUN xsltproc /home/imas/opt/catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl `ls -1 /opt/imas/core/IMAS/*/include/IDSDef.xml | head -1` > /tmp/variables
 
 # We have to prepare database for Catalog QT.
-# Schema is located here: /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql
-RUN echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" > /tmp/config && \
-    echo "/usr/local/mysql/bin/mysqladmin -uroot -ppassword --silent --wait=30 ping || exit 1" >> /tmp/config && \
-    echo "/usr/local/mysql/bin/mysql -uroot -ppassword < /home/imas/opt/catalog_qt_2/sql/schema/catalog_qt_db.sql" >> /tmp/config && \
-    echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < /tmp/variables" >> /tmp/config && \
-    echo "/usr/local/mysql/bin/mysqladmin shutdown -u root -ppassword --wait=30 ping || exit 1" >> /tmp/config && \
-    bash /tmp/config && \
-    rm -f /tmp/config
 
+RUN echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" > /tmp/config && \  
+   echo "/usr/local/mysql/bin/mysqladmin -uroot -ppassword --silent --wait=30 ping || exit 1" >> /tmp/config && \  
+   #  
+   # We prepare structure of DB, by running base script, and its alter scripts 'a_'  
+   echo "for a_sql_file in /home/imas/opt/catalog_qt_2/sql/schema/a_*" >> /tmp/config && \  
+   echo "do" >> /tmp/config && \  
+   echo "/usr/local/mysql/bin/mysql -uroot -ppassword < \$a_sql_file" >> /tmp/config && \  
+   echo "done" >> /tmp/config && \  
+   #  
+   #After creating structure od DB we have to import data, and load alter scripts for modyfing data in DB 'd_'  
+   echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < /tmp/variables" >> /tmp/config && \  
+   echo "for d_sql_file in /home/imas/opt/catalog_qt_2/sql/schema/d_*" >> /tmp/config && \  
+   echo "do" >> /tmp/config && \  
+   echo "/usr/local/mysql/bin/mysql -uroot -ppassword itm_catalog_qt < \$d_sql_file" >> /tmp/config && \  
+   echo "done" >> /tmp/config && \  
+   #
+   # end of modyfing DB.
+   echo "/usr/local/mysql/bin/mysqladmin shutdown -u root -ppassword --wait=30 ping || exit 1" >> /tmp/config && \  
+   bash /tmp/config && \  
+   rm -f /tmp/config
+   
 # This part of Docker file is responsible for setting up services (UpdateProcess and notify service)
 
 USER imas
 
 # Wrapper script is a convenient way of setting up IMAS env. variables and
 # running update process
-COPY --chown=imas scripts/wrapper.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
-RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/wrapper.sh
+COPY --chown=imas scripts/catalogqt-update-process.sh /home/imas/opt/catalog_qt_2/client/catalog-ws-client/catalogqt-update-process.sh
+RUN chmod +x /home/imas/opt/catalog_qt_2/client/catalog-ws-client/catalogqt-update-process.sh
 
-USER root
-
-COPY scripts/run.sh /opt/run.sh
-RUN chmod +x /opt/run.sh
-CMD /opt/run.sh
+COPY --chown=imas scripts/catalogqt.sh /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
+RUN chmod +x /home/imas/opt/catalog_qt_2/server/catalog-ws-server/catalogqt.sh
 
 # Install imas-inotify and dependencies
 ARG INOTIFY_TAG
@@ -124,20 +137,30 @@ RUN echo "INOTIFY_TAG:      ${INOTIFY_TAG}"
 RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
 
 RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify
-RUN pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
 
 RUN if [ -e /tmp/imas-inotify/config.ini ]; then cp /tmp/imas-inotify/config.ini /home/imas/opt/imas-inotify/config.ini; fi
 
-# Enable imas-inotify service
-COPY init.d/imas-inotify /etc/init.d/imas-inotify
-RUN sudo update-rc.d imas-inotify defaults
+# Configure imas-inotify
+COPY --chown=imas scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
 
-# TODO - move this part into imas-inotify handler
+USER root
+
+# Getting token for imas-inotify
 RUN java \
     -jar /home/imas/opt/catalog_qt_2/client/catalog-ws-client/target/catalogAPI.jar \
     -keyCloakServiceLogin \
     --realm-settings-file /home/imas/opt/catalog_qt_2/client/catalog-ws-client/src/main/resources/service-login.properties
 
-# Configure imas-inotify
-COPY scripts/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
+# Install imas-inotify dependencies
+RUN pip3 install -r /home/imas/opt/imas-inotify/requirements.txt
+
+# Enable imas-inotify service
+COPY init.d/imas-inotify /etc/init.d/imas-inotify
+RUN  update-rc.d imas-inotify defaults
+
+# Prepare entry point script
+COPY scripts/run.sh /opt/run.sh
+RUN chmod +x /opt/run.sh
+CMD /opt/run.sh
+
 

@@ -77,21 +77,3 @@ COPY files/inotify.sh /inotify.sh
 
 CMD ["/inotify.sh"]
 
-################################################################################
-
-FROM python AS dashboard
-
-COPY demonstrator-dashboard /demonstrator-dashboard
-COPY files/demonstrator-dashboard-override/* /tmp/demonstrator-dashboard-override/
-
-RUN apt-get update && \
-    apt-get install -y \
-        wait-for-it && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN if [ -e /tmp/demonstrator-dashboard-override/services_constants.py ]; then cp /tmp/demonstrator-dashboard-override/services_constants.py /demonstrator-dashboard/db_api/utils/; fi && \
-    pip install -r /demonstrator-dashboard/requirements.txt
-
-COPY files/dashboard.sh /dashboard.sh
-
-CMD ["/dashboard.sh"]

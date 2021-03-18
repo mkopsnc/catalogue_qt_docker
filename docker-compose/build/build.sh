@@ -1,10 +1,8 @@
 #! /bin/bash
 CATALOGQT_BRANCH=develop
-DASHBOARD_BRANCH=psnc/develop
 IMAS_INOTIFY_BRANCH=develop
 
 DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge-next.eufus.eu/git/catalog_qt_2"
-DEFAULT_DASHBOARD_REPO="--single-branch --branch ${DASHBOARD_BRANCH} https://gitlab.com/fair-for-fusion/demonstrator-dashboard"
 DEFAULT_IMAS_INOTIFY_REPO="--single-branch --branch ${IMAS_INOTIFY_BRANCH} https://github.com/tzok/imas-inotify"
 
 function helpexit {
@@ -17,9 +15,6 @@ function helpexit {
   echo
   echo '-catalogqt-repo    - you can pass location of repository and specify branch'
   echo "                     example: -catalogqt-repo=\"${DEFAULT_CATALOGQT_REPO}\""
-  echo
-  echo '-dashboard-repo    - you can pass location of repository and specify branch'
-  echo "                     example: -dashboard-repo=\"${DEFAULT_DASHBOARD_REPO}\""
   echo
   echo '-imas-inotify-repo - you can pass location of repository and specify branch'
   echo "                     example: -imas-inotify-repo=\"${DEFAULT_IMAS_INOTIFY_REPO}\""
@@ -40,10 +35,6 @@ do
 case $i in
     -catalogqt-repo=*)
       CATALOGQT_REPO="${i#*=}"
-      shift # go to next arg=val
-      ;;
-    -dashboard-repo=*)
-      DASHBOARD_REPO="${i#*=}"
       shift # go to next arg=val
       ;;
     -imas-inotify-repo=*)
@@ -71,7 +62,6 @@ esac
 done
 
 CATALOGQT_REPO="${CATALOGQT_REPO:-$DEFAULT_CATALOGQT_REPO}"
-DASHBOARD_REPO="${DASHBOARD_REPO:-$DEFAULT_DASHBOARD_REPO}"
 IMAS_INOTIFY_REPO="${IMAS_INOTIFY_REPO:-$DEFAULT_IMAS_INOTIFY_REPO}"
 
 echo 'Retrieving imas/ual image from rhus-71.man.poznan.pl - make sure to provide correct login/password'
@@ -91,20 +81,6 @@ else
         cd ..
     fi
     echo "Using catalog_qt_2 directory (git describe => $(cd catalog_qt_2; git describe))"
-fi
-
-if [[ ! -d demonstrator-dashboard ]]; then
-    echo 'Retrieving demonstrator dashboard - make sure to provide correct login/password'
-    git clone $DASHBOARD_REPO
-else
-    if [[ -n "${FORCE}" ]]; then
-        echo 'Updating demonstrator dashboard - make sure to provide correct login/password'
-        cd demonstrator-dashboard
-        git checkout ${DASHBOARD_BRANCH}
-        git pull
-        cd ..
-    fi
-    echo "Using demonstrator-dashboard directory (git describe => $(cd demonstrator-dashboard; git describe))"
 fi
 
 if [[ ! -d imas-inotify ]]; then
@@ -150,8 +126,3 @@ docker build \
     --tag catalogqt/inotify \
     .
 
-# use cache, tag dashboard
-docker build \
-    --target dashboard \
-    --tag catalogqt/dashboard \
-    .
