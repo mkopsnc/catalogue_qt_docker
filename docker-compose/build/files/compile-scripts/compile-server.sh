@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 CATALOG_QT_HOME=$1
 
 # server - this script is required for backward compatibility
