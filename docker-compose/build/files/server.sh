@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /catalog_qt_2/server/catalog-ws-server/
+cd /home/imas/catalog_qt_2/server/catalog-ws-server/
 
 wait-for-it db:3306 --timeout=0
 
