@@ -11,12 +11,13 @@ CLIENT_WS_DIR=/home/imas/opt/catalog_qt_2/client/catalog-ws-client
 CLIENT_WS_JAR=${CLIENT_WS_DIR}/target/catalogAPI.jar
 CLIENT_WS_PROPERTIES=${CLIENT_WS_DIR}/src/main/resources/service-login.properties
 
-export LD_LIBRARY_PATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/lib
-export CLASSPATH=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/jar/imas.jar:/usr/share/java/saxon9he.jar
-export IMAS_PREFIX=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}
+export IMAS_HOME=/opt/imas
+export IMAS_CORE=/opt/imas/core
+export LD_LIBRARY_PATH=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/lib:/usr/local/mdsplus/lib
+export CLASSPATH=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/jar/imas.jar:/usr/share/java/saxon9he.jar
+export IMAS_PREFIX=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}
 export IMAS_VERSION=${DD_VER}
-export IMAS_HOME=/home/imas/imas
-export ids_path=/home/imas/imas/core/IMAS/${DD_VER}-${AL_VER}/models/mdsplus
+export ids_path=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/models/mdsplus
 export UAL_VERSION=${AL_VER}
 
 loop=1
