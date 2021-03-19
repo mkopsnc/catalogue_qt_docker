@@ -6,13 +6,6 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=1
 
-  dashboard:
-    image: catalogqt/dashboard
-    ports:
-      - 8082:8082
-    volumes:
-      - ./fair4fusion-docker-demo:/docker-entrypoint-properties.d
-
   server:
     image: catalogqt/server
     ports:

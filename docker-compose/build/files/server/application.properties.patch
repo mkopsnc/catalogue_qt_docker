@@ -1,0 +1,8 @@
+--- catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties.orig        2020-10-28 13:51:29.453324729 +0100
++++ catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties     2020-10-28 13:51:39.103389225 +0100
+@@ -1,4 +1,4 @@
+-spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
++spring.datasource.url=jdbc:mysql://db:3306/itm_catalog_qt?serverTimezone=UTC
+
+ spring.datasource.username=itm_catalog_rw
+ spring.datasource.password=itm_catalog_rw

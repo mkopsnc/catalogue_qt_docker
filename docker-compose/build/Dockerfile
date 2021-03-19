@@ -2,21 +2,29 @@ FROM imas/ual AS ual
 
 COPY catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl /tmp/dumpSummaryFieldsSQL.xsl
 
-RUN echo 'USE itm_catalog_qt' > /tmp/20-variables.sql && \
-    xsltproc /tmp/dumpSummaryFieldsSQL.xsl /opt/imas/core/IMAS/*/include/IDSDef.xml >> /tmp/20-variables.sql
+RUN echo 'USE itm_catalog_qt' > /tmp/b_001_variables.sql && \
+    xsltproc /tmp/dumpSummaryFieldsSQL.xsl /opt/imas/core/IMAS/*/include/IDSDef.xml >> /tmp/b_001_variables.sql
 
 ################################################################################
 
 FROM mariadb AS db
 
-COPY catalog_qt_2/sql/schema/catalog_qt_db.sql /docker-entrypoint-initdb.d/10-schema.sql
-COPY --from=ual /tmp/20-variables.sql /docker-entrypoint-initdb.d/20-variables.sql
+COPY catalog_qt_2/sql/schema/*.sql /docker-entrypoint-initdb.d/
+COPY --from=ual /tmp/b_001_variables.sql /docker-entrypoint-initdb.d/
+
+RUN sed -i '1 i USE itm_catalog_qt' /docker-entrypoint-initdb.d/d_*.sql
 
 ################################################################################
 
 FROM imas/ual AS base
 
 COPY catalog_qt_2 /catalog_qt_2
+
+COPY files/compile-scripts/* /tmp/compile-scripts/
+RUN chmod +x /tmp/compile-scripts/compile-plugins.sh
+RUN chmod +x /tmp/compile-scripts/compile-common.sh
+RUN chmod +x /tmp/compile-scripts/compile-server.sh
+RUN chmod +x /tmp/compile-scripts/compile-client.sh
 
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 
@@ -27,11 +35,8 @@ RUN apt-get update && \
         wait-for-it && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mvn --file /catalog_qt_2/common/catalog-ws-common/pom.xml install -DskipTests && \
-    mvn install:install-file -Dfile=/catalog_qt_2/common/catalog-ws-common/target/catalog-ws-common.jar -DgroupId=catalog-ws-common -DartifactId=catalog-ws-common -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
-    cp /opt/imas/core/IMAS/*/jar/imas.jar /tmp/imas.jar && \
-    mvn install:install-file -Dfile=/tmp/imas.jar -DgroupId=imas -DartifactId=imas -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar && \
-    rm /tmp/imas.jar
+RUN /tmp/compile-scripts/compile-common.sh /catalog_qt_2
+RUN /tmp/compile-scripts/compile-plugins.sh /catalog_qt_2
 
 RUN useradd --create-home --shell /bin/bash imas && \
     su - imas sh -c 'MODULEPATH=/opt/imas/etc/modulefiles module load IMAS; mkdir -p /home/imas/public/imasdb; command imasdb test'
@@ -40,11 +45,14 @@ RUN useradd --create-home --shell /bin/bash imas && \
 
 FROM base AS server
 
-COPY files/server-override/* /tmp/server-override/
+COPY files/server/*properties* /tmp/server/
 
-RUN if [ -e /tmp/server-override/application.properties ]; then cp /tmp/server-override/application.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi && \
-    if [ -e /tmp/server-override/url.properties ]; then cp /tmp/server-override/url.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi && \
-    mvn --file /catalog_qt_2/server/catalog-ws-server/pom.xml package -DskipTests
+RUN patch -p0 < /tmp/server/application.properties.patch
+
+RUN if [ -e /tmp/server/application.properties ]; then cp /tmp/server/application.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi
+RUN if [ -e /tmp/server/url.properties ]; then cp /tmp/server/url.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi
+
+RUN /tmp/compile-scripts/compile-server.sh /catalog_qt_2
 
 COPY files/server.sh /server.sh
 
@@ -54,7 +62,7 @@ CMD ["/server.sh"]
 
 FROM base AS client
 
-RUN mvn --file /catalog_qt_2/client/catalog-ws-client/pom.xml package -DskipTests
+RUN /tmp/compile-scripts/compile-client.sh /catalog_qt_2
 
 ################################################################################
 
@@ -75,21 +83,3 @@ COPY files/inotify.sh /inotify.sh
 
 CMD ["/inotify.sh"]
 
-################################################################################
-
-FROM python AS dashboard
-
-COPY demonstrator-dashboard /demonstrator-dashboard
-COPY files/demonstrator-dashboard-override/* /tmp/demonstrator-dashboard-override/
-
-RUN apt-get update && \
-    apt-get install -y \
-        wait-for-it && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN if [ -e /tmp/demonstrator-dashboard-override/services_constants.py ]; then cp /tmp/demonstrator-dashboard-override/services_constants.py /demonstrator-dashboard/db_api/utils/; fi && \
-    pip install -r /demonstrator-dashboard/requirements.txt
-
-COPY files/dashboard.sh /dashboard.sh
-
-CMD ["/dashboard.sh"]
