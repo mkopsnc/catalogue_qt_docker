@@ -4,6 +4,7 @@ services:
   server:
     volumes:
       - ./imasdb:/home/imas/public/imasdb
+      - ./cert:/home/imas/cert
 
   updateprocess:
     volumes:
