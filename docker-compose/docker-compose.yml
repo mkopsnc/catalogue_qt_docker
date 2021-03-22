@@ -10,8 +10,10 @@ services:
     image: catalogqt/server
     ports:
       - 8080:8080
+      - 8443:8443
     volumes:
       - imasdb:/home/imas/public/imasdb
+      - cert:/home/imas/cert
 
   updateprocess:
     image: catalogqt/updateprocess
