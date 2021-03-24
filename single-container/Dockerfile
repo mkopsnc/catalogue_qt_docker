@@ -85,10 +85,10 @@ RUN tar xf catalog_qt_2.tar
 COPY --chown=imas scripts/compile-scripts/* /home/imas/opt/
 RUN chmod +x /home/imas/opt/compile-*.sh
 
-RUN /home/imas/opt/compile-common.sh /home/imas/opt/catalog_qt_2
-RUN /home/imas/opt/compile-plugin.sh /home/imas/opt/catalog_qt_2
-RUN /home/imas/opt/compile-client.sh /home/imas/opt/catalog_qt_2
-RUN /home/imas/opt/compile-server.sh /home/imas/opt/catalog_qt_2
+RUN /home/imas/opt/compile-common.sh /home/imas/opt/catalog_qt_2 && \
+    /home/imas/opt/compile-plugin.sh /home/imas/opt/catalog_qt_2 && \
+    /home/imas/opt/compile-client.sh /home/imas/opt/catalog_qt_2 && \
+    /home/imas/opt/compile-server.sh /home/imas/opt/catalog_qt_2
 
 USER root
 
