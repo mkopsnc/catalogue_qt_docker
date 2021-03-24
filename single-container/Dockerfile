@@ -83,9 +83,13 @@ RUN tar xf catalog_qt_2.tar
 # and run it
 # The reason for keeping this file outside of Dockerfile is that file itself is quite
 # large and, additionally, it depends on source layout.
-COPY --chown=imas scripts/compile-java-code.sh /home/imas/opt/compile-java-code.sh
-RUN chmod +x /home/imas/opt/compile-java-code.sh
-RUN /home/imas/opt/compile-java-code.sh
+COPY --chown=imas scripts/compile-java-code-*.sh /home/imas/opt/
+RUN chmod +x /home/imas/opt/compile-java-code-*.sh
+
+RUN /home/imas/opt/compile-java-code-common.sh
+RUN /home/imas/opt/compile-java-code-plugin.sh
+RUN /home/imas/opt/compile-java-code-client.sh
+RUN /home/imas/opt/compile-java-code-server.sh
 
 USER root
 
