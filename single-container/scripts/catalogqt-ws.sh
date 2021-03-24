@@ -35,4 +35,6 @@ if [ ! -z "$DEBUG_SPRING_BOOT" ]; then
   fi
 fi
 
-java ${DEBUG_SPRING_BOOT} -jar ./target/catalog-ws-server-1.0.0-SNAPSHOT.jar
+JAR_FILE=$(ls -1 ./target/catalog-ws-server-*-SNAPSHOT.jar)
+
+java ${DEBUG_SPRING_BOOT} -jar ${JAR_FILE}
