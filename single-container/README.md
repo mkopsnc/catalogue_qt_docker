@@ -190,6 +190,18 @@ Once uncommented, you will be able to attach using port `32887` and debug all ca
 
 Note that this is a blocking action. Your container will always wait for debugger to connect whenever new data are ready for being populated.
 
+Alternatively you can pass environment variable: `DEBUG_IMAS_INOTIFY`
+
+```
+-e DEBUG_IMAS_INOTIFY=true
+```
+
+in that case, default settings for debugger will be used:
+
+```
+-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:32887
+```
+
 ### Enabling debugger for UpdateProcess
 
 Enabling `UpdateProcess` debugging can be done by passing environment variable to container
