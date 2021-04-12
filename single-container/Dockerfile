@@ -73,9 +73,11 @@ WORKDIR /home/imas
 
 #This is an opt inside user imas directory (do not confuse it with /opt)
 RUN mkdir -p /home/imas/opt
-COPY external/catalog_qt_2.tar /home/imas/opt/catalog_qt_2.tar
+RUN mkdir -p /home/imas/opt/etc
+#COPY external/catalog_qt_2.tar /home/imas/opt/catalog_qt_2.tar
+COPY external/catalog_qt_2/ /home/imas/opt/catalog_qt_2/
 WORKDIR /home/imas/opt
-RUN tar xf catalog_qt_2.tar
+#RUN tar xf catalog_qt_2.tar
 
 # Build Java codes
 # Prepare compilation script for Java based codes
@@ -121,9 +123,8 @@ RUN echo "INOTIFY_TAG_BASH: ${INOTIFY_TAG_BASH}"
 RUN git clone --single-branch --branch ${INOTIFY_TAG_BASH} https://github.com/tzok/imas-inotify.git /home/imas/opt/imas-inotify
 
 RUN if [ -e /tmp/imas-inotify/config.ini ]; then cp /tmp/imas-inotify/config.ini /home/imas/opt/imas-inotify/config.ini; fi
-
-# Configure imas-inotify
-COPY --chown=imas files/imas-inotify/handler-new-pulsefile.py /home/imas/opt/imas-inotify/handler-new-pulsefile.py
+RUN if [ -e /tmp/imas-inotify/handler-new-pulsefile-catalogqt.py ]; then cp /tmp/imas-inotify/handler-new-pulsefile-catalogqt.py /home/imas/opt/imas-inotify/handler-new-pulsefile-catalogqt.py; fi
+RUN if [ -e /tmp/imas-inotify/run-imas-inotify.sh ]; then cp /tmp/imas-inotify/run-imas-inotify.sh /home/imas/opt/imas-inotify/run-imas-inotify.sh && chmod +x /home/imas/opt/imas-inotify/run-imas-inotify.sh; fi
 
 USER root
 

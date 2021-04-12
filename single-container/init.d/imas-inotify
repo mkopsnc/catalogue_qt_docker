@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/home/imas/opt/imas-inotify"
-cmd="python imas-inotify.py"
+cmd="/home/imas/opt/imas-inotify/run-imas-inotify.sh"
 user="root"
 
 name=`basename $0`
