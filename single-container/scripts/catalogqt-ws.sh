@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ -f /home/imas/opt/etc/services-env ] && . /home/imas/opt/etc/services-env
+
 CATALOG_QT_CMD=$(readlink -m $0)
 CATALOG_QT_CMD_DIR=$(dirname ${CATALOG_QT_CMD})
 
@@ -37,4 +39,4 @@ fi
 
 JAR_FILE=$(ls -1 ./target/catalog-ws-server-*-SNAPSHOT.jar)
 
-java ${DEBUG_SPRING_BOOT} -jar ${JAR_FILE}
+java ${DEBUG_SPRING_BOOT_JDWP} -jar ${JAR_FILE}
