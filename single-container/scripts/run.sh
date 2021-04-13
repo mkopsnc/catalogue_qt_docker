@@ -45,25 +45,25 @@ echo "" > /home/imas/opt/etc/services-env
 
 if [ ! -z "$DEBUG_UPDATE_PROCESS" ]; then
   if [[ "${DEBUG_UPDATE_PROCESS}" == "true" ]]; then
-    echo "DEBUG_UPDATE_PROCESS=true" >> /home/imas/opt/etc/services-env
+    echo "export DEBUG_UPDATE_PROCESS=true" >> /home/imas/opt/etc/services-env
   else
-    echo "DEBUG_UPDATE_PROCESS=false" >> /home/imas/opt/etc/services-env
+    echo "export DEBUG_UPDATE_PROCESS=false" >> /home/imas/opt/etc/services-env
   fi
 fi
 
 if [ ! -z "$DEBUG_SPRING_BOOT" ]; then
   if [[ "${DEBUG_SPRING_BOOT}" == "true" ]]; then
-    echo "DEBUG_SPRING_BOOT=true" >> /home/imas/opt/etc/services-env
+    echo "export DEBUG_SPRING_BOOT=true" >> /home/imas/opt/etc/services-env
   else
-    echo "DEBUG_SPRING_BOOT=false" >> /home/imas/opt/etc/services-env
+    echo "export DEBUG_SPRING_BOOT=false" >> /home/imas/opt/etc/services-env
   fi
 fi
 
 if [ ! -z "$DEBUG_IMAS_INOTIFY" ]; then
   if [[ "${DEBUG_IMAS_INOTIFY}" == "true" ]]; then
-    echo "DEBUG_IMAS_INOTIFY=true" >> /home/imas/opt/etc/services-env
+    echo "export DEBUG_IMAS_INOTIFY=true" >> /home/imas/opt/etc/services-env
   else
-    echo "DEBUG_IMAS_INOTIFY=false" >> /home/imas/opt/etc/services-env
+    echo "export DEBUG_IMAS_INOTIFY=false" >> /home/imas/opt/etc/services-env
   fi
 fi
 
