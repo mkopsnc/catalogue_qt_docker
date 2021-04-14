@@ -15,12 +15,14 @@ CLIENT_WS_PROPERTIES=${CLIENT_WS_DIR}/src/main/resources/service-login.propertie
 
 export IMAS_HOME=/opt/imas
 export IMAS_CORE=/opt/imas/core
-export LD_LIBRARY_PATH=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/lib:/usr/local/mdsplus/lib
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/lib:/usr/local/mdsplus/lib:/opt/uda/lib
 export CLASSPATH=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/jar/imas.jar:/usr/share/java/saxon9he.jar
 export IMAS_PREFIX=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}
 export IMAS_VERSION=${DD_VER}
 export ids_path=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/models/mdsplus
 export UAL_VERSION=${AL_VER}
+
+module load uda
 
 loop=1
 tries=10
