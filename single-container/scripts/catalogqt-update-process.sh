@@ -21,8 +21,9 @@ export IMAS_PREFIX=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}
 export IMAS_VERSION=${DD_VER}
 export ids_path=${IMAS_CORE}/IMAS/${DD_VER}-${AL_VER}/models/mdsplus
 export UAL_VERSION=${AL_VER}
+export MODULEPATH=/etc/modulefiles:/opt/imas/etc/modulefiles:/opt/uda/modulefiles
 
-module load uda
+/usr/bin/modulecmd bash load uda
 
 loop=1
 tries=10
