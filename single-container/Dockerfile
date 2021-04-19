@@ -75,7 +75,7 @@ WORKDIR /home/imas
 RUN mkdir -p /home/imas/opt
 RUN mkdir -p /home/imas/opt/etc
 #COPY external/catalog_qt_2.tar /home/imas/opt/catalog_qt_2.tar
-COPY external/catalog_qt_2/ /home/imas/opt/catalog_qt_2/
+COPY --chown=imas external/catalog_qt_2/ /home/imas/opt/catalog_qt_2/
 WORKDIR /home/imas/opt
 #RUN tar xf catalog_qt_2.tar
 
