@@ -222,6 +222,12 @@ Enabling `Spring Boot` application inside Docker container you have to pass foll
 
 Note that only value `true` is treated as proper flag value for turning on `Spring Boot` debugger. Any other values will be skipped. Once debugger is started you will be able to attach using port `32889`.
 
+#### Schema of components in debug mode
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mkopsnc/catalogue_qt_docker/master/single-container/images/services.png"></a>
+</p>
+
 # Known limitations
 
 Note that this container should be used only for research purposes. You need access to Catalogue QT v.2.
