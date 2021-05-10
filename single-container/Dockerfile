@@ -12,6 +12,7 @@ RUN apt-get install -y wget
 RUN apt-get install -y maven
 RUN apt-get install -y default-jdk
 RUN apt-get install -y netcat
+RUN apt-get install -y vim
 
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 

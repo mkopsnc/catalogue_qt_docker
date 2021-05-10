@@ -24,10 +24,8 @@ Once you have it, you can clone `catalogue_qt_docker` repository
 ## Make sure to prepare sources of `Catalogue QT 2`
 
 ```
-> git clone \
+> git -C external clone \
   https://YOUR_USER_NAME@gforge-next.eufus.eu/git/catalog_qt_2 
-  
-> tar cf external/catalog_qt_2.tar ./catalog_qt_2
 ```
 
 # Building container
