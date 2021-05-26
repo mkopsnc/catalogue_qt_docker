@@ -73,13 +73,13 @@ CMD ["/updateprocess.sh"]
 
 ################################################################################
 
-FROM client AS inotify
+FROM client AS watchdog
 
-COPY imas-inotify /imas-inotify
+COPY imas-watchdog /imas-watchdog
 
-RUN pip3 install -r imas-inotify/requirements.txt
+RUN pip3 install -r imas-watchdog/requirements.txt
 
-COPY files/inotify.sh /inotify.sh
+COPY files/watchdog.sh /watchdog.sh
 
-CMD ["/inotify.sh"]
+CMD ["/watchdog.sh"]
 

@@ -8,20 +8,37 @@ services:
 
   server:
     image: catalogqt/server
-    ports:
-      - 8080:8080
-      - 8443:8443
     volumes:
       - imasdb:/home/imas/public/imasdb
       - cert:/home/imas/cert
+    depends_on:
+      - db
 
   updateprocess:
     image: catalogqt/updateprocess
     volumes:
       - imasdb:/home/imas/public/imasdb
+    depends_on:
+      - server
 
-  inotify:
-    image: catalogqt/inotify
+  watchdog:
+    image: catalogqt/watchdog
     volumes:
       - imasdb:/home/imas/public/imasdb
-      - ./fair4fusion-docker-demo:/docker-entrypoint-properties.d
+    depends_on:
+      - server
+
+  react:
+    image: registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
+    environment:
+      - LISTEN_PORT=9100
+      - S6_READ_ONLY_ROOT=1
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./volumes/nginx/reverse-proxy.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8080:80
+    depends_on:
+      - react

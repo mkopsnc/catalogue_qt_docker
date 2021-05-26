@@ -4,8 +4,8 @@ java \
     -keyCloakServiceLogin \
     --realm-settings-file /docker-entrypoint-properties.d/service-login.properties
 
-cd imas-inotify
+cd imas-watchdog
 
 wait-for-it server:8080 --timeout=0
 
-exec ./imas-inotify.py --verbose
+exec ./main.py --config imasdb.ini --verbose
