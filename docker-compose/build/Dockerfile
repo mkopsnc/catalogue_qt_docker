@@ -55,8 +55,8 @@ RUN if [ -e /tmp/server/url.properties ]; then cp /tmp/server/url.properties /ca
 RUN /tmp/compile-scripts/compile-server.sh /catalog_qt_2
 
 COPY files/server.sh /server.sh
-
 CMD ["/server.sh"]
+EXPOSE 8080
 
 ################################################################################
 
