@@ -19,6 +19,8 @@ services:
     environment:
       - MAIN_DOMAIN=scilla.man.poznan.pl
       - CATALOG_QT_API_URL=https://scilla.man.poznan.pl:8443/
+    ports:
+      - 80:9100
 
 volumes:
   imasdb:

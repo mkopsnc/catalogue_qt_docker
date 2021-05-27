@@ -10,6 +10,9 @@ services:
     image: catalogqt/server
     depends_on:
       - db
+    ports:
+      - 8080:8080
+      - 8443:8443
 
   updateprocess:
     image: catalogqt/updateprocess
@@ -26,12 +29,3 @@ services:
     environment:
       - LISTEN_PORT=9100
       - S6_READ_ONLY_ROOT=1
-
-  nginx:
-    image: nginx
-    volumes:
-      - ./volumes/nginx/reverse-proxy.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - 8080:80
-    depends_on:
-      - react
