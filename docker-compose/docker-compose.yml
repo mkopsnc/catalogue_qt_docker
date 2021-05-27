@@ -8,23 +8,16 @@ services:
 
   server:
     image: catalogqt/server
-    volumes:
-      - imasdb:/home/imas/public/imasdb
-      - cert:/home/imas/cert
     depends_on:
       - db
 
   updateprocess:
     image: catalogqt/updateprocess
-    volumes:
-      - imasdb:/home/imas/public/imasdb
     depends_on:
       - server
 
   watchdog:
     image: catalogqt/watchdog
-    volumes:
-      - imasdb:/home/imas/public/imasdb
     depends_on:
       - server
 
