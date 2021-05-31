@@ -24,7 +24,7 @@ pipeline {
                         git branch: 'master', url: 'https://github.com/tzok/imas-inotify.git'
                     }
                     dir('catalog_qt_2'){
-                        git branch: 'master', credentialsId: 'catalog-qt-credentials', url: 'https://gforge-next.eufus.eu/git/catalog_qt_2'
+                        git branch: 'develop', credentialsId: 'catalog-qt-credentials', url: 'https://gforge-next.eufus.eu/git/catalog_qt_2'
                     }
                     script{
                         docker.build('catalogqt', '--no-cache .')
