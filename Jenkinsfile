@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
     stages {
 
         // stage('Get imas/ual') {
@@ -13,6 +16,11 @@ pipeline {
         //         }
         //     }
         // }
+
+        // TODO: pytania
+        // jakie repa mają być pollowane
+        // z których gałęzi ma być budowane
+
 
         // stage('Build Catalog QT Docker') {
         //     steps {
