@@ -1,5 +1,6 @@
 catalog_qt_2
 demonstrator-dashboard
 imas-inotify
+imas-watchdog
 files/server/application.properties
 files/server/url.properties

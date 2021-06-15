@@ -55,8 +55,9 @@ RUN if [ -e /tmp/server/url.properties ]; then cp /tmp/server/url.properties /ca
 RUN /tmp/compile-scripts/compile-server.sh /catalog_qt_2
 
 COPY files/server.sh /server.sh
-
 CMD ["/server.sh"]
+EXPOSE 8080
+EXPOSE 8443
 
 ################################################################################
 
@@ -73,13 +74,13 @@ CMD ["/updateprocess.sh"]
 
 ################################################################################
 
-FROM client AS inotify
+FROM client AS watchdog
 
-COPY imas-inotify /imas-inotify
+COPY imas-watchdog /imas-watchdog
 
-RUN pip3 install -r imas-inotify/requirements.txt
+RUN pip3 install -r imas-watchdog/requirements.txt
 
-COPY files/inotify.sh /inotify.sh
+COPY files/watchdog.sh /watchdog.sh
 
-CMD ["/inotify.sh"]
+CMD ["/watchdog.sh"]
 

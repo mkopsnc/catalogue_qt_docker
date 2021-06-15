@@ -1,0 +1,9 @@
+graph TD
+    ual(FROM imas/ual AS ual)
+    db(FROM mariadb AS db)-->|copies from|ual
+    base(FROM imas/ual AS base)
+    server(FROM base AS server)-->|extends|base
+    client(FROM base AS client)--->|extends|base
+    updateprocess(FROM client AS updateprocess)-->|extends|client
+    inotify(FROM client AS inotify)-->|extends|client
+

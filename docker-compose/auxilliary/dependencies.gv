@@ -1,0 +1,10 @@
+digraph G {
+    db
+    server
+    updateprocess
+    inotify
+
+    updateprocess -> server
+    inotify -> server
+    server -> db
+}
