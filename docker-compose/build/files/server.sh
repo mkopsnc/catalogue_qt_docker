@@ -13,5 +13,5 @@ else
     echo "======RUNNING SERVER IN DEBUG MODE======"
     exec java \
         -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
-        -jar ./target/catalog-ws-server-1.0.0-SNAPSHOT.jar
+        -jar ./target/catalog-ws-server-1.1.0-SNAPSHOT.jar
 fi
