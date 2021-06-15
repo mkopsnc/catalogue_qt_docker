@@ -1,0 +1,9 @@
+graph TD
+    db[(image: catalogqt/db)]
+    server(image: catalogqt/server)-->|waits for|db
+    updateprocess(image: catalogqt/updateprocess)-->|waits for|server
+    inotify(image: catalogqy/inotify)-->|waits for|server
+    react(image: f4f/dashboard-ui)-->|communicates with|server
+    nginx(image: nginx)-->|proxies connections|react
+    volume[/volume with pulsefiles/]-->|mounted to|inotify
+    persist[/volume to persist database/]-->|mounted to|db

@@ -1,30 +1,30 @@
 #! /bin/bash
 CATALOGQT_BRANCH=develop
-IMAS_INOTIFY_BRANCH=develop
+IMAS_WATCHDOG_BRANCH=master
 
 DEFAULT_CATALOGQT_REPO="--single-branch --branch ${CATALOGQT_BRANCH} https://gforge-next.eufus.eu/git/catalog_qt_2"
-DEFAULT_IMAS_INOTIFY_REPO="--single-branch --branch ${IMAS_INOTIFY_BRANCH} https://github.com/tzok/imas-inotify"
+DEFAULT_IMAS_WATCHDOG_REPO="--single-branch --branch ${IMAS_WATCHDOG_BRANCH} https://github.com/tzok/imas-watchdog"
 
 function helpexit {
   echo
   echo 'syntax: ./build.sh [-catalogqt-repo="catalog_qt2 repo with branch if needed"]'
   echo '                   [-dashboard-repo="dashboard repo with branch if needed"]'
-  echo '                   [-imas-inotify-repo="imas-notify repo with branch if needed"]'
+  echo '                   [-imas-watchdog-repo="imas-watchdog repo with branch if needed"]'
   echo '                   [-help]'
   echo
   echo
-  echo '-catalogqt-repo    - you can pass location of repository and specify branch'
+  echo '-catalogqt-repo     - you can pass location of repository and specify branch'
   echo "                     example: -catalogqt-repo=\"${DEFAULT_CATALOGQT_REPO}\""
   echo
-  echo '-imas-inotify-repo - you can pass location of repository and specify branch'
-  echo "                     example: -imas-inotify-repo=\"${DEFAULT_IMAS_INOTIFY_REPO}\""
+  echo '-imas-watchdog-repo - you can pass location of repository and specify branch'
+  echo "                      example: -imas-watchdog-repo=\"${DEFAULT_IMAS_WATCHDOG_REPO}\""
   echo
-  echo '-force             - perform git-checkout and git-pull, even for existing directories'
-  echo '                     (beware: this option will cause full image rebuilt without cache)'
+  echo '-force              - perform git-checkout and git-pull, even for existing directories'
+  echo '                      (beware: this option will cause full image rebuilt without cache)'
   echo
-  echo '-no-cache          - do not use Docker cache when building images'
+  echo '-no-cache           - do not use Docker cache when building images'
   echo
-  echo '-help/--help       - prints help and quits'
+  echo '-help/--help        - prints help and quits'
   echo
   echo
   exit 1
@@ -37,8 +37,8 @@ case $i in
       CATALOGQT_REPO="${i#*=}"
       shift # go to next arg=val
       ;;
-    -imas-inotify-repo=*)
-      IMAS_INOTIFY_REPO="${i#*=}"
+    -imas-watchdog-repo=*)
+      IMAS_WATCHDOG_REPO="${i#*=}"
       shift # go to next arg=val
       ;;
     -h)
@@ -62,7 +62,7 @@ esac
 done
 
 CATALOGQT_REPO="${CATALOGQT_REPO:-$DEFAULT_CATALOGQT_REPO}"
-IMAS_INOTIFY_REPO="${IMAS_INOTIFY_REPO:-$DEFAULT_IMAS_INOTIFY_REPO}"
+IMAS_WATCHDOG_REPO="${IMAS_WATCHDOG_REPO:-$DEFAULT_IMAS_WATCHDOG_REPO}"
 
 echo 'Retrieving imas/ual image from rhus-71.man.poznan.pl - make sure to provide correct login/password'
 docker login rhus-71.man.poznan.pl
@@ -83,18 +83,18 @@ else
     echo "Using catalog_qt_2 directory (git describe => $(cd catalog_qt_2; git describe))"
 fi
 
-if [[ ! -d imas-inotify ]]; then
-    echo 'Retrieving imas-inotify - make sure to provide correct login/password'
-    git clone $IMAS_INOTIFY_REPO
+if [[ ! -d imas-watchdog ]]; then
+    echo 'Retrieving imas-watchdog - make sure to provide correct login/password'
+    git clone $IMAS_WATCHDOG_REPO
 else
     if [[ -n "${FORCE}" ]]; then
-        echo 'Updating imas-inotify - make sure to provide correct login/password'
-        cd imas-inotify
-        git checkout ${IMAS_INOTIFY_BRANCH}
+        echo 'Updating imas-watchdog - make sure to provide correct login/password'
+        cd imas-watchdog
+        git checkout ${IMAS_WATCHDOG_BRANCH}
         git pull
         cd ..
     fi
-    echo "Using existing imas-inotify directory (git describe => $(cd imas-inotify; git describe))"
+    echo "Using existing imas-watchdog directory (git describe => $(cd imas-watchdog; git describe))"
 fi
 
 # build all stages
@@ -120,9 +120,9 @@ docker build \
     --tag catalogqt/db \
     .
 
-# use cache, tag inotify
+# use cache, tag watchdog
 docker build \
-    --target inotify \
-    --tag catalogqt/inotify \
+    --target watchdog \
+    --tag catalogqt/watchdog \
     .
 
