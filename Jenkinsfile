@@ -25,8 +25,8 @@ pipeline {
         stage('Build Catalog QT Docker') {
             steps {
                 dir('docker-compose/build'){
-                    dir('imas-inotify'){
-                        git branch: 'master', url: 'https://github.com/tzok/imas-inotify.git'
+                    dir('imas-watchdog'){
+                        git branch: 'master', url: 'https://github.com/tzok/imas-watchdog'
                     }
                     dir('catalog_qt_2'){
                         git branch: 'develop', credentialsId: 'catalog-qt-credentials', url: 'https://gforge-next.eufus.eu/git/catalog_qt_2'
@@ -39,8 +39,8 @@ pipeline {
                         sh 'docker tag catalogqt/server registry.apps.paas-dev.psnc.pl/catalog-qt/server'
                         docker.build('catalogqt/db', '--target db .')
                         sh 'docker tag catalogqt/db registry.apps.paas-dev.psnc.pl/catalog-qt/db'
-                        docker.build('catalogqt/inotify', '--target inotify .')
-                        sh 'docker tag catalogqt/inotify registry.apps.paas-dev.psnc.pl/catalog-qt/inotify'
+                        docker.build('catalogqt/watchdog', '--target watchdog .')
+                        sh 'docker tag catalogqt/watchdog registry.apps.paas-dev.psnc.pl/catalog-qt/watchdog'
                     }
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
                         sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/updateprocess'
                         sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/server'
                         sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/db'
-                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/inotify'
+                        sh 'docker push registry.apps.paas-dev.psnc.pl/catalog-qt/watchdog'
                     }
                 }
             }
