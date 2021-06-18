@@ -99,5 +99,5 @@ RUN chmod -R g=u /home/imas/.local
 
 COPY --chown=imas:root files/watchdog.sh /home/imas/watchdog.sh
 
-CMD ["/watchdog.sh"]
+CMD ["/home/imas/watchdog.sh"]
 
