@@ -3,7 +3,7 @@ print_help_and_exit() {
     echo "Usage: $0 [-h] [-r] [-s stage]" >&2
     echo "  -h:       Print help" >&2
     echo "  -r:       Remove containers" >&2
-    echo "  -s stage: Select stage, either development or production" >&2
+    echo "  -s stage: Select stage, either development or production or notoken" >&2
     exit
 }
 

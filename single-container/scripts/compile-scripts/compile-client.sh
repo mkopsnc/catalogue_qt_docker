@@ -11,7 +11,6 @@ if [[ $RESULT -eq 0 ]]; then
   if [ -e ${CATALOG_QT_HOME}/plugin/imas-feeder-plugin ]; then
  
     cd ${CATALOG_QT_HOME}/client/catalog-ws-client
- 
     mvn install -DskipTests
 
   else
