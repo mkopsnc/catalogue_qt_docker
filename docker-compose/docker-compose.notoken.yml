@@ -7,6 +7,8 @@ services:
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
       - ./volumes/cert:/home/imas/cert
+    ports:
+      - 32889:32889
 
   updateprocess:
     environment:
