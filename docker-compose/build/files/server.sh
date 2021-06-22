@@ -3,15 +3,14 @@ cd /catalog_qt_2/server/catalog-ws-server/
 
 wait-for-it db:3306 --timeout=0
 
-if [ -z "$DEBUG" ]; then
-    exec mvn spring-boot:run
-else
-    # exec mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
-    # Doesn't work. It does not propagate debug arguments to executable.
-    # lsof -i -P -N | grep listen doens't show any listening process on port 5005
+DEBUG_SPRING_BOOT_JDWP=""
 
-    echo "======RUNNING SERVER IN DEBUG MODE======"
-    exec java \
-        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
-        -jar ./target/catalog-ws-server-1.1.0-SNAPSHOT.jar
+if [ ! -z "$DEBUG_SPRING_BOOT" ]; then
+  if [[ "${DEBUG_SPRING_BOOT}" == "true" ]]; then
+    DEBUG_SPRING_BOOT_JDWP="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:32889"
+  fi
 fi
+
+JAR_FILE=$(ls -1 ./target/catalog-ws-server-*-SNAPSHOT.jar)
+
+exec java ${DEBUG_SPRING_BOOT_JDWP} -jar ${JAR_FILE}
