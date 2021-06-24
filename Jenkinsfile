@@ -9,9 +9,9 @@ pipeline {
             steps {
                 script{
                     docker.withRegistry('https://rhus-71.man.poznan.pl', 'docker-credentials'){
-                        def image = docker.image('imas/ual:3.30.0-4.8.4')
+                        def image = docker.image('imas/ual')
                         image.pull()
-                        sh 'docker tag rhus-71.man.poznan.pl/imas/ual:3.30.0-4.8.4 imas/ual'
+                        sh 'docker tag rhus-71.man.poznan.pl/imas/ual imas/ual'
                     }
                 }
             }
