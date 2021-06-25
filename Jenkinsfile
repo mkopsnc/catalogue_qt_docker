@@ -17,11 +17,6 @@ pipeline {
             }
         }
 
-        // TODO: pytania
-        // jakie repa mają być pollowane
-        // z których gałęzi ma być budowane
-
-
         stage('Build Catalog QT Docker') {
             steps {
                 dir('docker-compose/build'){

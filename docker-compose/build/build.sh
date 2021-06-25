@@ -67,10 +67,10 @@ done
 CATALOGQT_REPO="${CATALOGQT_REPO:-$DEFAULT_CATALOGQT_REPO}"
 IMAS_WATCHDOG_REPO="${IMAS_WATCHDOG_REPO:-$DEFAULT_IMAS_WATCHDOG_REPO}"
 
-# echo 'Retrieving imas/ual image from rhus-71.man.poznan.pl - make sure to provide correct login/password'
-# docker login rhus-71.man.poznan.pl
-# docker pull rhus-71.man.poznan.pl/imas/ual
-# docker tag rhus-71.man.poznan.pl/imas/ual imas/ual
+echo 'Retrieving imas/ual image from rhus-71.man.poznan.pl - make sure to provide correct login/password'
+docker login rhus-71.man.poznan.pl
+docker pull rhus-71.man.poznan.pl/imas/ual
+docker tag rhus-71.man.poznan.pl/imas/ual imas/ual
 
 if [[ ! -d catalog_qt_2 ]]; then
     echo "Retrieving catalog_qt_2 - make sure to provide correct login/password"
