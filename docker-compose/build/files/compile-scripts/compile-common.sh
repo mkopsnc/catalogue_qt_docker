@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 CATALOG_QT_HOME=$1
 
 # common - this script is needed for backward compatibility

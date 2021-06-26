@@ -29,3 +29,11 @@ services:
     environment:
       - LISTEN_PORT=9100
       - S6_READ_ONLY_ROOT=1
+
+# Docker compose doesn't like openVPN https://stackoverflow.com/a/56136591
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.57.0/24

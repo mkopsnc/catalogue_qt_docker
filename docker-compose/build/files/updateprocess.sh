@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CLIENT_WS_DIR=/catalog_qt_2/client/catalog-ws-client/
+CLIENT_WS_DIR=/home/imas/catalog_qt_2/client/catalog-ws-client/
 CLIENT_WS_JAR=${CLIENT_WS_DIR}/target/catalogAPI.jar
 CLIENT_WS_PROPERTIES=${CLIENT_WS_DIR}/src/main/resources/service-login.properties
 

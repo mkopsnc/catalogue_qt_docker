@@ -1,4 +1,7 @@
 #! /bin/bash
+
+set -e
+
 CATALOGQT_BRANCH=develop
 IMAS_WATCHDOG_BRANCH=master
 
