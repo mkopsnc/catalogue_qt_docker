@@ -10,31 +10,31 @@ services:
   server:
     environment:
       - DISABLE_ACCESS_TOKEN=true
-      - DEBUG_SPRING_BOOT=true
+      # - DEBUG_SPRING_BOOT=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
       - ./volumes/cert:/home/imas/cert
-    ports:
-      - 32889:32889
+    # ports:
+    #   - 32889:32889
 
   updateprocess:
     environment:
       - DISABLE_ACCESS_TOKEN=true
-      - DEBUG_UPDATE_PROCESS=true
+      # - DEBUG_UPDATE_PROCESS=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
-    ports:
-      - 32888:32888
+    # ports:
+      # - 32888:32888
 
   watchdog:
     environment:
       - DISABLE_ACCESS_TOKEN=true
-      - DEBUG_IMAS_WATCHDOG=true
+      # - DEBUG_IMAS_WATCHDOG=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
       - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
-    ports:
-      - 32887:32887
+    # ports:
+      # - 32887:32887
 
   react:
     environment:
