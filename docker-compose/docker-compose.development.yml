@@ -1,6 +1,10 @@
 version: "3.6"
 
 services:
+  db:
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+
   server:
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
