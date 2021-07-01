@@ -7,6 +7,9 @@ services:
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
       - ./volumes/cert:/home/imas/cert
+      - ./volumes/server-properties:/home/imas/server-properties
+    ports:
+      - 8083:8083
 
   updateprocess:
     environment:

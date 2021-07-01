@@ -8,7 +8,8 @@ The easiest, fastest way to get it running follows
 > git clone https://github.com/mkopsnc/catalogue_qt_docker.git
 > cd docker-compose/build
 > ./build.sh
-> docker-compose up
+> cd ..
+> ./run.sh -s notoken
 ```
 
 # Prepare your work environment
@@ -17,10 +18,8 @@ In order to build this container, you will need access to few repositories. This
 
 - `imas/ual`
 - `catalog_qt_2`
-- `demonstrator-dashboard`
-- `imas-inotify`
-
-**These catalogs should be placed in `docker-compose/build` directory**
+- `dashboard-ReactJS`
+- `imas-watchdog`
 
 ## Make sure you can access imas/ual
  
@@ -43,25 +42,29 @@ You will be asked for a user name and password. If you don't have it, contact de
 You will also need an access to `catalog_qt_2` project. Make sure you can access it.
 
 ```
-> git clone --single-branch https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+> git clone --single-branch develop https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
 ```
 
-## Make sure you can access demonstrator-dashboard
+## Make sure you can access dashboard-ReactJS
 
-Demonstrator-Dashboard is a UI part of the whole solution. It is hosted on gitlab as a separate project. Make sure to ask for an access to this project and double check whether you can get the source code or not.
-
-The most recent codes are on branch `psnc/develop`.
+Docker image that contains Dashboard application can be downloaded from `registry.apps.man.poznan.pl`. Make sure you can access it.
 
 ```
-> git clone --single-branch --branch psnc/develop  https://gitlab.com/fair-for-fusion/demonstrator-dashboard
+docker login registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
 ```
 
-## Make sure you can access imas-inotify project
+Note! Running Dashboard locally requires an entry inside `/etc/hosts`
+
+```
+127.0.0.1       localhost.dashboard-ui.pl
+```
+
+## Make sure you can access imas-watchdog project
 
 This repository is publicly available. All you have to do, is to double check whether you can clone it
 
 ```
-> git clone --single-branch https://github.com/tzok/imas-inotify.git
+> git clone --single-branch https://github.com/tzok/imas-watchdog.git
 ```
 
 ***
@@ -74,7 +77,7 @@ In order to build and run container you have to do following
 > cd docker-compose/build
 > ./build.sh
 > cd ..
-> docker-compose up 
+> ./run.sh -s notoken
 ```
 
 ***
@@ -84,11 +87,11 @@ In order to build and run container you have to do following
 Starting the container is quite simple, all you have to do is to run
 
 ```
-> docker-compose run
+> ./run.sh -s notoken
 ```
 
 - [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
-- [localhost:8082](http://localhost:8082) to access Demonstrator Dashboard
+- [localhost.dashboard-ui.pl:9010](http://localhost.dashboard-ui.pl:9010) to access Dashboard-ReactJS
 
 ***
 
@@ -139,15 +142,16 @@ Make sure your directories structure looks like this
 Make sure that data directory is linked inside `docker-compose` - we have to make sure that Docker container can see our local data. Once it is done, you can run Docker container.
 
 ```
+> cd catalogue_qt_docker/docker-compose/volumes/imasdb
+> cp -r ../../f4f-data/imasdb/* .
 > cd catalogue_qt_docker/docker-compose
-> ln -s ../../f4f-data/imasdb
-> docker-container up
+> ./run.sh -s notoken
 ```
 
 This way, you have bind mounted your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension. You can do it following way. Inside directory with data execute `script.sh` with the name of database you want to have populated.
 
 ```
-> cd f4f-data/imasdb
+> cd catalogue_qt_docker/docker-compose/volumes/imasdb
 > ./script.sh f4f
 ```
 
