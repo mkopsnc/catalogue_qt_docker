@@ -50,7 +50,7 @@ You will also need an access to `catalog_qt_2` project. Make sure you can access
 Docker image that contains Dashboard application can be downloaded from a Docker registry
 
 ```
-registry.apps.man.poznan.pl`.
+registry.apps.man.poznan.pl
 
 Before you proceed, make sure you can access the registry. You can test it by executing following command
 

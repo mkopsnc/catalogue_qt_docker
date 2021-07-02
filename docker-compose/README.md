@@ -4,7 +4,7 @@ Be prepared to:
 
 - Login into `rhus-71.man.poznan.pl` Docker registry
 - Login into `gforge6.eufus.eu` project named `catalog_qt_2`
-- Login into `gitlab.com` project named `fair-for-fusion/demonstrator-dashboard`
+- Login into `registry.apps.man.poznan.pl` Docker registry
 
 ```
 cd build
@@ -13,17 +13,29 @@ cd build
 
 # Running
 
+Catalogue QT 2 Docker can be run using multiple configurations. By default we provide following configurations
+
 ```
-docker-compose up
+production  - configured for production Keycloak instance (eduTEAMS)
+development - configured for development based Keycloak instance (user:pass - demo001:demo001)
+debug       - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
+notoken     - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
+```
+
+You can run given configuration by calling
+
+```
+./run.sh -s notoken
 ```
 
 # Configuration
 
-You can edit `docker-compose.override.yml` to change:
+You can edit `docker-compose._deployment_name_.yml` to change:
 
 - The path where MySQL will store the data (default: `$(pwd)/db-data`)
 - The path where pulsefiles are stored on the host (default: `$(pwd)/imasdb`)
 - To map MySQL port to host port, so you can access the database from the container (by deafult no ports are exposed)
+- To add custom configuration of Web Services: `application.properties` file
 
 After changing the settings, it may be necessary to restart from scratch:
 
@@ -34,7 +46,7 @@ docker-compose up
 
 # Container dependencies
 
-![](dependencies.svg)
+![](auxilliary/dependencies.svg)
 
 -   Container `server` connects to `db`. The connection URL is in file: `catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties` in line:
 
@@ -56,7 +68,7 @@ docker-compose up
 
     If you want to change `server` container name in `docker-compose.yml`, then edit `build/files/updateprocess.sh` and rebuild `catalogqt/updateprocess` image.
 
--   Container `inotify` connects to `server`. The connection URL is configurable in the `config.ini` file of `tzok/imas-inotify` project. Currently, the file in `master` branch has a valid URL. If you want to change `server` container name in `docker-compose.yml`, then (1) create a copy of `config.ini` from `tzok/imas-inotify`, (2) change its `url` line, (3) add `COPY` instruction to Dockerfile's part related to `catalogqt/inotify` and (4) rebuild this image.
+-   Container `watchdog` connects to `server`. The connection URL is configurable in the `config.ini` file of `tzok/imas-watchdog` project. Currently, the file in `master` branch has a valid URL. If you want to change `server` container name in `docker-compose.yml`, then (1) create a copy of `config.ini` from `tzok/imas-watchdog`, (2) change its `url` line, (3) add `COPY` instruction to Dockerfile's part related to `catalogqt/inotify` and (4) rebuild this image.
 
 -   Container `dashboard` connects to `server` The connection URL is set in `demonstrator-dashboard/db_api/services.py` in line starting with `API_ROOT = `. This line is changed by `sed` in the Dockerfile
 
@@ -64,34 +76,58 @@ docker-compose up
 
 ## Debugging in docker-compose
 
+You can debug either all the Java based components, inside Docker container, or you can specify which one should be started in debug more. For debugging Java code inside Docker containers we are using `JDWP` protocol, and by default we are using following ports
+
+```
+Web Services   - 32889
+Update process - 32888
+imas-watchdog  - 32887
+```
+
+![](auxilliary/debugging_services.png)
+
+In order to enable debbug mode you can either use predefined `docker-compose.debug.yml` or enable debug mode for each service separatelly by adding sections inside your YAML file of choice.
+
 ### Catalog-ws-server
 
-To debug catalog-ws-server you need to add specific lines to `docker-compose.override.yaml` in `server` section
+To debug catalog-ws-server you need to add following lines to `docker-compose.####.yml` in `server` section
 
 ```yaml
   server:
     volumes:
-      - ./imasdb:/home/imas/public/imasdb
-      - ./build/catalog_qt_2:/catalog_qt_2 #1
+      - ./volumes/imasdb:/home/imas/public/imasdb
     ports:
-      - 5005:5005 #2
+      - 32889:32889
     environment: 
-      - DEBUG=1 #3
+      - DEBUG_SPRING_BOOT=true
 ```
 
-1. Maps your code on host machine to the code inside container, allowing you to use your favourite IDE debugger capabilities. Also, you can change your code and run `docker-compose restart` to rerun container. This allows container to integrate your newest code.
+### Update process
 
-2. Exposes port for Java debugger, usually `5005`.
+To debug update-process you need to add following lines to `docker-compose.####.yml` in `updateprocess` section
 
-3. Enables debugging on catalog-ws-server.
-
-You also need to run 
-
-`echo '' > build/files/server/application.properties.patch`
-
-and in `catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties` change
-
-```diff
--spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
-+spring.datasource.url=jdbc:mysql://db:3306/itm_catalog_qt?serverTimezone=UTC
+```yaml
+  updateprocess:
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+    ports:
+      - 32888:32888
+    environment:
+      - DEBUG_UPDATE_PROCESS=true
 ```
+
+### Watchdog
+
+To debug imas-watchdog you need to add following lines to `docker-compose.####.yml` in `updateprocess` section
+
+```yaml
+  watchdog:
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+      - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
+    ports:
+      - 32887:32887
+    environment:
+      - DEBUG_IMAS_WATCHDOG=true
+```
+
