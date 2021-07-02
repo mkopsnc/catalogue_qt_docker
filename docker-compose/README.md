@@ -43,6 +43,18 @@ After changing the settings, it may be necessary to restart from scratch:
 docker-compose rm
 docker-compose up
 ```
+## Adding persistent storage
+
+You can add persistent storage by setting it up inside `docker-compose.yml` file
+
+```
+services:
+  db:
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+```
+
+It is not required to link `./volumes/mysql` location. In case you are using some other location for persistent data, feel free to use it instead.
 
 # Container dependencies
 
