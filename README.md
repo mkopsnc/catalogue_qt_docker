@@ -47,13 +47,18 @@ You will also need an access to `catalog_qt_2` project. Make sure you can access
 
 ## Make sure you can access dashboard-ReactJS
 
-Docker image that contains Dashboard application can be downloaded from `registry.apps.man.poznan.pl`. Make sure you can access it.
+Docker image that contains Dashboard application can be downloaded from a Docker registry
+
+```
+registry.apps.man.poznan.pl`.
+
+Before you proceed, make sure you can access the registry. You can test it by executing following command
 
 ```
 docker login registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
 ```
 
-Note! Running Dashboard locally requires an entry inside `/etc/hosts`
+*Note!* Running Dashboard locally requires an entry inside `/etc/hosts`
 
 ```
 127.0.0.1       localhost.dashboard-ui.pl
@@ -64,7 +69,7 @@ Note! Running Dashboard locally requires an entry inside `/etc/hosts`
 This repository is publicly available. All you have to do, is to double check whether you can clone it
 
 ```
-> git clone --single-branch https://github.com/tzok/imas-watchdog.git
+> git clone --single-branch master https://github.com/tzok/imas-watchdog.git
 ```
 
 ***
@@ -76,8 +81,6 @@ In order to build and run container you have to do following
 ```
 > cd docker-compose/build
 > ./build.sh
-> cd ..
-> ./run.sh -s notoken
 ```
 
 ***
@@ -87,6 +90,7 @@ In order to build and run container you have to do following
 Starting the container is quite simple, all you have to do is to run
 
 ```
+> cd docker-compose
 > ./run.sh -s notoken
 ```
 
@@ -110,45 +114,39 @@ Make sure your directories structure looks like this
 
 ```
 .
-|-- catalogue_qt_docker
-|   |-- docker-compose
-|   |-- images
-|   `-- single-container
-`-- f4f-data
-    `-- imasdb
-        |-- f4f
-        |   `-- 3
-        |       |-- 0
-        |       |   |-- ids_11062020.characteristics
-        |       |   |-- ids_11062020.datafile
-        |       |   |-- ids_11062020.populate
-        |       |   |-- ids_11062020.tree
-        |       |   |-- ids_11062021.characteristics
-        |       |   |-- ids_11062021.datafile
-        |       |   |-- ids_11062021.populate
-        |       |   `-- ids_11062021.tree
-        |       |-- 1
-        |       |-- 2
-        |       |-- 3
-        |       |-- 4
-        |       |-- 5
-        |       |-- 6
-        |       |-- 7
-        |       |-- 8
-        |       `-- 9
-        `-- script.sh
+`-- catalogue_qt_docker
+    `-- docker-compose
+        `-- volumes
+            `-- imasdb
+                |-- f4f
+                |   `-- 3
+                |       |-- 0
+                |       |   |-- ids_11062020.characteristics
+                |       |   |-- ids_11062020.datafile
+                |       |   |-- ids_11062020.populate
+                |       |   |-- ids_11062020.tree
+                |       |   |-- ids_11062021.characteristics
+                |       |   |-- ids_11062021.datafile
+                |       |   |-- ids_11062021.populate
+                |       |   `-- ids_11062021.tree
+                |       |-- 1
+                |       |-- 2
+                |       |-- 3
+                |       |-- 4
+                |       |-- 5
+                |       |-- 6
+                |       |-- 7
+                |       |-- 8
+                |       `-- 9
+                `-- script.sh
 ```
-
-Make sure that data directory is linked inside `docker-compose` - we have to make sure that Docker container can see our local data. Once it is done, you can run Docker container.
+Directory 
 
 ```
-> cd catalogue_qt_docker/docker-compose/volumes/imasdb
-> cp -r ../../f4f-data/imasdb/* .
-> cd catalogue_qt_docker/docker-compose
-> ./run.sh -s notoken
+catalogue_qt_docker/docker-compose/volumes/imasdb            
 ```
 
-This way, you have bind mounted your local filesystem inside Docker container. Once Docker is running you can schedule data population by creating file with `*.populate` extension. You can do it following way. Inside directory with data execute `script.sh` with the name of database you want to have populated.
+is automatically mounted inside Docker container. It means that anything you have put in it, will be visible inside Docker container whenever it is running. Once Docker is running you can schedule data population by creating file with `*.populate` extension. You can do it following way. Inside directory with data execute `script.sh` with the name of database you want to have populated.
 
 ```
 > cd catalogue_qt_docker/docker-compose/volumes/imasdb
@@ -163,7 +161,7 @@ This way, you have bind mounted your local filesystem inside Docker container. O
 
 # Setting up external volume for MySQL data
 
-To use an external volume for MySQL, you need to edit `docker-compose/docker-compose.override.yml` file like here:
+To use an external volume for MySQL, you need to edit `docker-compose/docker-compose.####.yml` file like here:
 
 ```diff
 @@ -1,6 +1,10 @@
@@ -176,7 +174,7 @@ To use an external volume for MySQL, you need to edit `docker-compose/docker-com
 +
    server:
      volumes:
-       - ./imasdb:/home/imas/public/imasdb
+       - ./volumes/imasdb:/home/imas/public/imasdb
 ```
 
 The added line contains a path to your external volume as seen by the host OS (e.g. `/mnt/vdb1` or `/home/user/catalogqt-mysql`).
@@ -192,7 +190,7 @@ docker-compose up
 
 # Known limitations
 
-Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Demonstrator Dashboard source repositories.
+Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Dashboard-ReactJS source repositories.
 
 ***
 
