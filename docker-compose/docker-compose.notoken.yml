@@ -6,8 +6,6 @@ services:
       - DISABLE_ACCESS_TOKEN=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
-      - ./volumes/cert:/home/imas/cert
-      - ./volumes/server-properties:/home/imas/server-properties
 
   updateprocess:
     environment:
