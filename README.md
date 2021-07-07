@@ -94,8 +94,8 @@ Starting the container is quite simple, all you have to do is to run
 > ./run.sh -s notoken
 ```
 
-- [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
-- [localhost.dashboard-ui.pl:9010](http://localhost.dashboard-ui.pl:9010) to access Dashboard-ReactJS
+- [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
+- [http://localhost.dashboard-ui.pl:9100/dashboard/](http://localhost.dashboard-ui.pl:9100/dashboard/) to access Dashboard-ReactJS
 
 ***
 
