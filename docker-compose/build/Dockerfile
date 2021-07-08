@@ -3,7 +3,10 @@ FROM imas/ual AS ual
 COPY catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl /tmp/dumpSummaryFieldsSQL.xsl
 
 RUN echo 'USE itm_catalog_qt' > /tmp/b_001_variables.sql && \
-    xsltproc /tmp/dumpSummaryFieldsSQL.xsl /opt/imas/core/IMAS/*/include/IDSDef.xml >> /tmp/b_001_variables.sql
+    echo 'USE itm_catalog_qt' > /tmp/b_002_variables.sql && \
+    xsltproc /tmp/dumpSummaryFieldsSQL.xsl /opt/imas/core/IMAS/*/include/IDSDef.xml >> /tmp/b_001_variables.sql && \
+    xsltproc /tmp/dumpFairFieldsSQL.xsl /opt/imas/core/IMAS/*/include/IDSDef.xml >> /tmp/b_002_variables.sql
+
 
 ################################################################################
 
@@ -11,6 +14,7 @@ FROM mariadb AS db
 
 COPY catalog_qt_2/sql/schema/*.sql /docker-entrypoint-initdb.d/
 COPY --from=ual /tmp/b_001_variables.sql /docker-entrypoint-initdb.d/
+COPY --from=ual /tmp/b_002_variables.sql /docker-entrypoint-initdb.d/
 
 RUN sed -i '1 i USE itm_catalog_qt' /docker-entrypoint-initdb.d/d_*.sql
 
