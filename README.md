@@ -51,6 +51,7 @@ Docker image that contains Dashboard application can be downloaded from a Docker
 
 ```
 registry.apps.man.poznan.pl
+```
 
 Before you proceed, make sure you can access the registry. You can test it by executing following command
 
@@ -58,7 +59,7 @@ Before you proceed, make sure you can access the registry. You can test it by ex
 docker login registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
 ```
 
-*Note!* Running Dashboard locally requires an entry inside `/etc/hosts`
+**Note!** Running Dashboard locally requires an entry inside `/etc/hosts`
 
 ```
 127.0.0.1       localhost.dashboard-ui.pl
@@ -140,13 +141,8 @@ Make sure your directories structure looks like this
                 |       `-- 9
                 `-- script.sh
 ```
-Directory 
 
-```
-catalogue_qt_docker/docker-compose/volumes/imasdb            
-```
-
-is automatically mounted inside Docker container. It means that anything you have put in it, will be visible inside Docker container whenever it is running. Once Docker is running you can schedule data population by creating file with `*.populate` extension. You can do it following way. Inside directory with data execute `script.sh` with the name of database you want to have populated.
+Directory `catalogue_qt_docker/docker-compose/volumes/imasdb` is automatically mounted inside Docker container. It means that anything you have put in it, will be visible inside Docker container whenever it is running. Once Docker is running you can schedule data population by creating file with `*.populate` extension. You can do it following way. Inside directory with data execute `script.sh` with the name of database you want to have populated.
 
 ```
 > cd catalogue_qt_docker/docker-compose/volumes/imasdb
