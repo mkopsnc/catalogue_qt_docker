@@ -1,6 +1,7 @@
 FROM imas/ual AS ual
 
 COPY catalog_qt_2/sql/feed/imas/dumpSummaryFieldsSQL.xsl /tmp/dumpSummaryFieldsSQL.xsl
+COPY catalog_qt_2/sql/feed/imas/dumpFairFieldsSQL.xsl /tmp/dumpFairFieldsSQL.xsl
 
 RUN echo 'USE itm_catalog_qt' > /tmp/b_001_variables.sql && \
     echo 'USE itm_catalog_qt' > /tmp/b_002_variables.sql && \
