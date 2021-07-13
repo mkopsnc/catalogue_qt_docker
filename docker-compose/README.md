@@ -379,7 +379,7 @@ make sure to remove the network and bring everything up again
 > docker-compose up
 ```
 
-This should solve your isse, all interfaces should have `MTU` being aligned
+This should solve your issue, all interfaces should have `MTU` being aligned
 
 ```
 ...
