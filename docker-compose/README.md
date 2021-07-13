@@ -86,6 +86,8 @@ In order to build and run container you have to do following
 > ./build.sh
 ```
 
+**Note!** If you would like to pull the latest codes while rebuiling container please use `-force` flag  
+**Note!** If you would like to build without cache use `-no-cache` flag  
 
 
 # Starting container
