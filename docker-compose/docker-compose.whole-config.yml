@@ -1,0 +1,51 @@
+version: "3.6"
+
+services:
+  db:
+    ports:
+      - 3306:3306
+      - 33060:33060
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+
+  server:
+    environment:
+      - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
+      - DISABLE_ACCESS_TOKEN=true
+      # - DEBUG_SPRING_BOOT=true
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+      - ./volumes/cert:/home/imas/cert
+      - ./volumes/server-properties:/home/imas/server-properties
+    ports:
+      - 32889:32889 #DEBUG PORT
+
+  updateprocess:
+    environment:
+    #   - DISABLE_ACCESS_TOKEN=true
+    #   - DEBUG_UPDATE_PROCESS=true
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+    # ports:
+    #   - 32888:32888
+
+  watchdog:
+    environment:
+    #   - DISABLE_ACCESS_TOKEN=true
+    #   - DEBUG_IMAS_WATCHDOG=true
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+      - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
+    # ports:
+    #   - 32887:32887
+
+  react:
+    environment:
+      - MAIN_DOMAIN=localhost.dashboard-ui.pl
+      - AUTH_CLIENT_ID=dashboard-ui-devel
+      - AUTH_CLIENT_SECRET=3ef78bd2-029f-4d77-b8ec-102cc6361564
+      - AUTH_OPENID_PROVIDER=
+      - CATALOG_QT_API_URL=http://localhost:8080/
+    ports:
+      - 9100:9100
+
