@@ -133,7 +133,7 @@ Additionally you can edit existing configuration, or create your own e.g `docker
 ### Catalog QT 2 Web Services Configuration
 
 Moreover, in our `catalog-ws-server` we have `application.properties` file, which is a configuration for our Web Services in Springboot.
-The explanation of this file is described here https://docs.psnc.pl/display/WFMS/Administration section `3.4.1. Anatomy of application.properties file`
+The explanation of this file is described here https://docs.psnc.pl/display/WFMS/Administration section `4.4.2.1. Anatomy of application.properties file`
 
 The default configuration is inside our project, but (before building) if you want to use a diffrent configuration (e.g enabling SSL certificates, or changing ports) you can paste in folder `/catalogue_qt_docker/docker-compose/build/files/server` another `application.properties` file, which will have higher priority and would override existing file in source codes and then you can build and run our docker.
 
