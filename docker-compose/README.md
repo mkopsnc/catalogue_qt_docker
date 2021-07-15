@@ -2,6 +2,11 @@
 
 This container is desined to simplify installation of Catalogue QT and it's components. Instead of installing it on `IMAS` compatible platform you can use it on virtually any machine.
 
+# Known limitations
+
+Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Dashboard-ReactJS source repositories.
+
+***
 
 **Note!** If you are installing our docker for the first time please go to the next section of this documentation. Otherwise you have access to all of our repositories and can build docker easily as follows: 
 
@@ -95,6 +100,7 @@ In order to build and run container you have to do following
 Catalogue QT 2 Docker can be run using multiple configurations. By default we provide following configurations
 
 ```
+all-conf    - all avaiable configuration in one file (you can comment partciular lines to disable functionalities)
 production  - configured for production Keycloak instance (eduTEAMS)
 development - configured for development based Keycloak instance (user:pass - demo001:demo001)
 debug       - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
@@ -118,17 +124,21 @@ To access our application please paste this urls in your browser:
 # Configuration
 
 ### Docker-compose Configuration
-You can edit `docker-compose._deployment_name_.yml` to change:
+
+**Note!** If you're not familiar with docker enviroment, please remember that building and running are diffrent!     
+If you have already build container, you can change some of the configuration of containers without rebulding whole docker, which save a lot of time.  
+To do so open configutation file `docker-compose._deployment_name_.yml` and change if you wish:
 
 - The path where MySQL will store the data (default: `$(pwd)/db-data`)
 - The path where pulsefiles are stored on the host (default: `$(pwd)/imasdb`)
 - To map MySQL port to host port, so you can access the database from the container (by deafult no ports are exposed)
-- To add custom configuration of Web Services: `application.properties` file
+- To add custom configuration of Web Services: `application.properties` file  
 
-Additionally you can edit existing configuration, or create your own e.g `docker-compose.myconf.yml` and run it!
+Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it!
 ```
 > ./run.sh -s myconf
 ```
+
 
 ### Catalog QT 2 Web Services Configuration
 
@@ -137,9 +147,18 @@ The explanation of this file is described here https://docs.psnc.pl/display/WFMS
 
 The default configuration is inside our project, but (before building) if you want to use a diffrent configuration (e.g enabling SSL certificates, or changing ports) you can paste in folder `/catalogue_qt_docker/docker-compose/build/files/server` another `application.properties` file, which will have higher priority and would override existing file in source codes and then you can build and run our docker.
 
-If you have already build container, and want to change Web Services configuration, you can do that without rebuilding docker!
-All you need to do is to add `application.properties` file to this folder `docker-compose/volumes/server-properties`. 
+If you have already build container, and want to change Web Services configuration, you can do that without rebuilding docker!  
+All you need to do is to add `application.properties` file to this folder `docker-compose/volumes/server-properties`.   
+Then add this to your `docker-compose._deployment_name_.yml` in **server** section:
+```
+server:
+  volumes:
+    - ./volumes/server-properties:/home/imas/server-properties 
+```
+This line maps your `application.properties` on localhost to the file on container.    
 When the container is taken off, it will have the highest priority.
+
+
 
 
 After changing the settings, it may be necessary to restart from scratch:
@@ -224,34 +243,6 @@ If anything goes wrong, please delete all the `.populate` files by executing thi
 And then try to import data again.
 ***
 
-# Container dependencies
-
-![](auxilliary/dependencies.svg)
-
--   Container `server` connects to `db`. The connection URL is in file: `catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties` in line:
-
-    ```
-    spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
-    ```
-
-    This line is changed by `sed` in Dockerfile to correct value. If you want to change `db` container name in `docker-compose.yml`, then edit the Dockerfile and rebuild `catalogqt/server`.
-
--   Container `updateprocess` connects to `server`. The connection URL is hard-coded in the main command `/updateprocess.sh` in the last lines:
-
-    ```
-    exec java -jar target/catalogAPI.jar \
-        -startUpdateProcess \
-        --url http://server:8080 \
-        --scheme mdsplus \
-        --slice-limit 100
-    ```
-
-    If you want to change `server` container name in `docker-compose.yml`, then edit `build/files/updateprocess.sh` and rebuild `catalogqt/updateprocess` image.
-
--   Container `watchdog` connects to `server`. The connection URL is configurable in the `config.ini` file of `tzok/imas-watchdog` project. Currently, the file in `master` branch has a valid URL. If you want to change `server` container name in `docker-compose.yml`, then (1) create a copy of `config.ini` from `tzok/imas-watchdog`, (2) change its `url` line, (3) add `COPY` instruction to Dockerfile's part related to `catalogqt/inotify` and (4) rebuild this image.
-
--   Container `dashboard` connects to `server` The connection URL is set in `demonstrator-dashboard/db_api/services.py` in line starting with `API_ROOT = `. This line is changed by `sed` in the Dockerfile
-
 # Developer informations
 
 ## Debugging in docker-compose
@@ -276,11 +267,31 @@ To debug catalog-ws-server you need to add following lines to `docker-compose.##
   server:
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
+      - /path/to/your/directory/catalog_qt_2/server/catalog-ws-server:/catalog_qt_2/server/catalog-ws-server #1
     ports:
-      - 32889:32889
+      - 32889:32889 #2
     environment: 
-      - DEBUG_SPRING_BOOT=true
+      - DEBUG_SPRING_BOOT=true #3
 ```
+
+If you want to develop Catalog QT 2 codes in a easy way with connection to container you should:
+
+1. Clone the repo of `catalog_qt_2` outside `catalogue_qt_docker` directory (e.g. `/Desktop`).
+2. Run `./compile.sh` script in chosen folder directory.
+3. Map your choosen directory path on localhost to directory of `catalog_qt_2` codes on `docker-compose_server_1` container directory  .
+   This is what `#1` line is doing.  
+4. Rerun container.
+5. You will see that Spring isn't taking off - that means it waits for a remote debbuger to connect!
+6. Go to your IDE - we are using Intellij IDE.   ![image](https://user-images.githubusercontent.com/34068433/125778110-2a41eda3-5ab6-46bf-98ad-c64221434c9c.png)
+   a. top left corner -> click `+` `Add new configuration`
+   b. choose `Remote JVM Debug`  
+   c. set settings as in a screen shot above (**Important!!** change port to **32889** or diffrent one set in `docker-compose.####.yml`    
+   d. run debug mode in IDE  
+7. In your konsole you will see that Spring is taken off!
+8. Go to your IDE and set breakpoint
+9. In Swagger or Postman send proper request on port 8080
+10. If this works - bravo!! You're ready to debug! 
+
 
 ### Update process
 
@@ -312,11 +323,33 @@ To debug imas-watchdog you need to add following lines to `docker-compose.####.y
 ```
 
 
-# Known limitations
+# Container dependencies
 
-Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Dashboard-ReactJS source repositories.
+![](auxilliary/dependencies.svg)
 
-***
+-   Container `server` connects to `db`. The connection URL is in file: `catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties` in line:
+
+    ```
+    spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
+    ```
+
+    This line is changed by `sed` in Dockerfile to correct value. If you want to change `db` container name in `docker-compose.yml`, then edit the Dockerfile and rebuild `catalogqt/server`.
+
+-   Container `updateprocess` connects to `server`. The connection URL is hard-coded in the main command `/updateprocess.sh` in the last lines:
+
+    ```
+    exec java -jar target/catalogAPI.jar \
+        -startUpdateProcess \
+        --url http://server:8080 \
+        --scheme mdsplus \
+        --slice-limit 100
+    ```
+
+    If you want to change `server` container name in `docker-compose.yml`, then edit `build/files/updateprocess.sh` and rebuild `catalogqt/updateprocess` image.
+
+-   Container `watchdog` connects to `server`. The connection URL is configurable in the `config.ini` file of `tzok/imas-watchdog` project. Currently, the file in `master` branch has a valid URL. If you want to change `server` container name in `docker-compose.yml`, then (1) create a copy of `config.ini` from `tzok/imas-watchdog`, (2) change its `url` line, (3) add `COPY` instruction to Dockerfile's part related to `catalogqt/inotify` and (4) rebuild this image.
+
+-   Container `dashboard` connects to `server` The connection URL is set in `demonstrator-dashboard/db_api/services.py` in line starting with `API_ROOT = `. This line is changed by `sed` in the Dockerfile
 
 # Troubleshooting download issues inside Docker
 
