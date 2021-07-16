@@ -100,7 +100,7 @@ In order to build and run container you have to do following
 Catalogue QT 2 Docker can be run using multiple configurations. By default we provide following configurations
 
 ```
-all-conf    - all avaiable configuration in one file (you can comment partciular lines to disable functionalities)
+all-conf    - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
 production  - configured for production Keycloak instance (eduTEAMS)
 development - configured for development based Keycloak instance (user:pass - demo001:demo001)
 debug       - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
@@ -143,7 +143,7 @@ Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it
 ### Catalog QT 2 Web Services Configuration
 
 Moreover, in our `catalog-ws-server` we have `application.properties` file, which is a configuration for our Web Services in Springboot.
-The explanation of this file is described here https://docs.psnc.pl/display/WFMS/Administration section `4.4.2.1. Anatomy of application.properties file`
+The explanation of this file is described here https://docs.psnc.pl/display/WFMS/Administration section `4.5.2.1. Anatomy of application.properties file`
 
 The default configuration is inside our project, but (before building) if you want to use a diffrent configuration (e.g enabling SSL certificates, or changing ports) you can paste in folder `/catalogue_qt_docker/docker-compose/build/files/server` another `application.properties` file, which will have higher priority and would override existing file in source codes and then you can build and run our docker.
 
@@ -243,6 +243,37 @@ If anything goes wrong, please delete all the `.populate` files by executing thi
 And then try to import data again.
 ***
 
+# Setting up an SSL certificate
+The best way to obtain an SSL certificate is to use certbot. You can get certbot in multiple ways described https://certbot.eff.org/docs/install.html.
+
+After installation, you need to obtain the raw `.pem` certificate and convert it to `.p12`. Do this by running 
+```
+certbot certonly --standalone 
+```
+Provide required information about your domain.
+
+Required files will be located in /`etc/letsencrypt/live/name_of_your_domain` .
+
+Go to this folder and run the command below. 
+
+```
+openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12 -name tomcat -CAfile chain.pem -caname root
+```
+
+You will be asked to provide a password. Remember it as you will have to enter it in the `application.properties`.  
+The output file `keystore.p12` is the file that has all the required information to set up SSL.
+
+In `application.properties` enter this information:
+
+```
+server.ssl.key-store="path to your keystore.p12 file"
+server.ssl.key-store-password="password to keystore.p12 file"
+```
+
+Congratulations! You have set up an SSL certificate!
+
+
+
 # Developer informations
 
 ## Debugging in docker-compose
@@ -269,9 +300,9 @@ To debug catalog-ws-server you need to add following lines to `docker-compose.##
       - ./volumes/imasdb:/home/imas/public/imasdb
       - /path/to/your/directory/catalog_qt_2/server/catalog-ws-server:/catalog_qt_2/server/catalog-ws-server #1
     ports:
-      - 32889:32889 #2
+      - 32889:32889 
     environment: 
-      - DEBUG_SPRING_BOOT=true #3
+      - DEBUG_SPRING_BOOT=true 
 ```
 
 If you want to develop Catalog QT 2 codes in a easy way with connection to container you should:
@@ -283,14 +314,16 @@ If you want to develop Catalog QT 2 codes in a easy way with connection to conta
 4. Rerun container.
 5. You will see that Spring isn't taking off - that means it waits for a remote debbuger to connect!
 6. Go to your IDE - we are using Intellij IDE.   ![image](https://user-images.githubusercontent.com/34068433/125778110-2a41eda3-5ab6-46bf-98ad-c64221434c9c.png)
-   a. top left corner -> click `+` `Add new configuration`
+   a. top left corner -> click `+` `Add new configuration`   
    b. choose `Remote JVM Debug`  
    c. set settings as in a screen shot above (**Important!!** change port to **32889** or diffrent one set in `docker-compose.####.yml`    
    d. run debug mode in IDE  
 7. In your konsole you will see that Spring is taken off!
 8. Go to your IDE and set breakpoint
 9. In Swagger or Postman send proper request on port 8080
-10. If this works - bravo!! You're ready to debug! 
+
+
+**If this works - bravo!! You're ready to debug!**
 
 
 ### Update process
