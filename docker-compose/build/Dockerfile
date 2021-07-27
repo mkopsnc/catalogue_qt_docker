@@ -31,8 +31,8 @@ COPY --chown=imas:root files/compile-scripts/* /tmp/compile-scripts/
 
 RUN chown -R 1000:0 /home/imas && \
     chmod -R g+w /home/imas/ && \
-    chown -R 1000:0 /etc && \
-    chmod -R g+w /etc
+    chown 1000:0 /etc/passwd && \
+    chmod g+w /etc/passwd
 
 COPY files/uid_entrypoint.sh /uid_entrypoint.sh
 RUN chmod g=u /etc/passwd && chmod 775 /uid_entrypoint.sh
