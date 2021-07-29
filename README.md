@@ -107,8 +107,8 @@ Catalog QT Demonstrator allows to import MDSPlus based data automatically into S
 First of all, make sure you have `MDSPlus` like directory structure with pulse files. The easiest way to execute Docker container with sample data is to get sample data from `box.psnc.pl` - these are completely artificially created data prepared by testing framework.
 
 ```
-> curl -s -o f4f_data.tar.gz \
-    https://box.psnc.pl/seafhttp/files/01953e73-8ad3-4277-be71-57b69c395355/f4f_data.tar.gz
+> curl -L -o f4f.tar \
+    "https://box.pionier.net.pl/f/f03c04fbac70477fb748/?dl=1"
 ```
 
 Make sure your directories structure looks like this
