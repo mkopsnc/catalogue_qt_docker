@@ -67,7 +67,7 @@ FROM base AS server
 
 COPY --chown=imas:root files/server/*properties* /tmp/server/
 
-RUN patch --follow-symlinks /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties /tmp/server/application.properties.patch
+RUN patch --follow-symlinks /home/imas/catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties /tmp/server/application.properties.patch
 
 RUN if [ -e /tmp/server/application.properties ]; then cp /tmp/server/application.properties catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi
 RUN if [ -e /tmp/server/url.properties ]; then cp /tmp/server/url.properties catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi
