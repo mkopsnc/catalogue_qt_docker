@@ -1,0 +1,31 @@
+version: "3.6"
+
+services:
+  db:
+    image: catalogqt/db
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+
+  server:
+    image: catalogqt/server
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+      - 8443:8443
+
+  updateprocess:
+    image: catalogqt/updateprocess
+    depends_on:
+      - server
+
+  watchdog:
+    image: catalogqt/watchdog
+    depends_on:
+      - server
+
+  react:
+    image: registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
+    environment:
+      - LISTEN_PORT=9100
+      - S6_READ_ONLY_ROOT=1
