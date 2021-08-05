@@ -24,3 +24,8 @@ services:
     depends_on:
       - server
 
+  react:
+    image: registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
+    environment:
+      - LISTEN_PORT=9100
+      - S6_READ_ONLY_ROOT=1
