@@ -36,12 +36,3 @@ services:
     ports:
       - 32887:32887
 
-  react:
-    environment:
-      - MAIN_DOMAIN=localhost.dashboard-ui.pl
-      - AUTH_CLIENT_ID=dashboard-ui-devel
-      - AUTH_CLIENT_SECRET=3ef78bd2-029f-4d77-b8ec-102cc6361564
-      - AUTH_OPENID_PROVIDER=
-      - CATALOG_QT_API_URL=http://localhost:8080/
-    ports:
-      - 9100:9100

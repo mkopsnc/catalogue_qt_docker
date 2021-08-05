@@ -1,20 +1,6 @@
 version: "3.6"
 
 services:
-  server:
-    volumes:
-      - ./volumes/imasdb:/home/imas/public/imasdb
-      - ./volumes/cert:/home/imas/cert
-
-  updateprocess:
-    volumes:
-      - ./volumes/imasdb:/home/imas/public/imasdb
-
-  watchdog:
-    volumes:
-      - ./volumes/imasdb:/home/imas/public/imasdb
-      - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
-
   react:
     environment:
       - MAIN_DOMAIN=localhost.dashboard-ui.pl

@@ -8,7 +8,8 @@ print_help_and_exit() {
 }
 
 action=up
-stage=
+
+declare -a stages
 
 while getopts hrs: arg; do
     case ${arg} in
@@ -19,14 +20,15 @@ while getopts hrs: arg; do
             action=rm
             ;;
         s)
-            stage=${OPTARG}
+            stages+=(${OPTARG})
             ;;
     esac
 done
 
-[[ -z ${stage} ]] && print_help_and_exit
+[[ ${#stages[@]} == 0 ]] && print_help_and_exit
 
-docker-compose \
-    -f docker-compose.yml \
-    -f docker-compose.${stage}.yml \
-    ${action}
+DOCKER_COMPOSE_ARG="-f docker-compose.yml"
+
+for i in "${stages[@]}"; do DOCKER_COMPOSE_ARG="${DOCKER_COMPOSE_ARG} -f docker-compose.${i}.yml"; done
+
+docker-compose ${DOCKER_COMPOSE_ARG} ${action}
