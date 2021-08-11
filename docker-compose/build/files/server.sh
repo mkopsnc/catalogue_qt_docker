@@ -12,8 +12,7 @@ if [ ! -z "$DEBUG_SPRING_BOOT" ]; then
 fi
 
 if [ -e /home/imas/server-properties/application.properties ]; then
-  mkdir -p config
-  cp /home/imas/server-properties/application.properties ./config
+  export SPRING_CONFIG_LOCATION=file:///home/imas/server-properties/application.properties 
 fi
 
 JAR_FILE=$(ls -1 ./target/catalog-ws-server-*-SNAPSHOT.jar)
