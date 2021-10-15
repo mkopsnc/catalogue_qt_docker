@@ -1,0 +1,15 @@
+version: "3.6"
+
+services:
+  react:
+    image: registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
+    environment:
+      - LISTEN_PORT=9100
+      - S6_READ_ONLY_ROOT=1
+      - MAIN_DOMAIN=localhost.dashboard-ui.pl
+      - AUTH_CLIENT_ID=dashboard-ui-devel
+      - AUTH_CLIENT_SECRET=3ef78bd2-029f-4d77-b8ec-102cc6361564
+      - AUTH_OPENID_PROVIDER=https://sso.apps.paas-dev.psnc.pl/auth/realms/fair4fusion-docker-demo
+      - CATALOG_QT_API_URL=http://localhost:8080/
+    ports:
+      - 9100:9100
