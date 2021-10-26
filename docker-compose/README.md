@@ -15,7 +15,7 @@ Note that this container should be used only for research purposes. You need acc
 > cd docker-compose/build
 > ./build.sh
 > cd ..
-> ./run.sh -s notoken
+> ./run.sh -s api-noauth
 ```
 
 ***
@@ -100,11 +100,11 @@ In order to build and run container you have to do following
 Catalogue QT 2 Docker can be run using multiple configurations. By default we provide following configurations
 
 ```
-all-conf    - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
-production  - configured for production Keycloak instance (eduTEAMS)
-development - configured for development based Keycloak instance (user:pass - demo001:demo001)
-debug       - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
-notoken     - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
+api-allconf    - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
+api-production  - configured for production Keycloak instance (eduTEAMS)
+api-development - configured for development based Keycloak instance (user:pass - demo001:demo001)
+api-debug       - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
+api-noauth     - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
 ```
 
 You can run given configuration by calling
@@ -112,7 +112,7 @@ You can run given configuration by calling
 ```
 > cd docker-compose
 # ./run.sh -s <configuration file suffix> e.g.
-> ./run.sh -s notoken
+> ./run.sh -s noauth
 ```
 
 To access our application please paste this urls in your browser:

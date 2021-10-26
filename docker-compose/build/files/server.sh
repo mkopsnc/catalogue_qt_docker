@@ -12,7 +12,7 @@ if [ ! -z "$DEBUG_SPRING_BOOT" ]; then
 fi
 
 if [ -e /home/imas/server-properties/application.properties ]; then
-`  sed -i '/spring.datasource.url/ s/localhost/db/g' /home/imas/server-properties/application.properties`
+# `  sed -i '/spring.datasource.url/ s/localhost/db/g' /home/imas/server-properties/application.properties`
   export SPRING_CONFIG_LOCATION=file:///home/imas/server-properties/application.properties 
 fi
 

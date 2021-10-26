@@ -1,0 +1,122 @@
+#This is configuration file that consists explanation of whole possible settings in Catalog QT 2
+
+#To configure the orchestration, Docker Compose uses a docker-compose.yml file. 
+#It specifies what images are required, what ports they need to expose, 
+#whether they have access to the host filesystem, 
+#what commands should be run when they start up, and so on.
+
+
+#This denotes that we are using version 3 of Docker Compose, and Docker will provide the appropriate features. 
+version: "3.6"
+
+# In a docker-compose.yml file, services represent the containers that will be created in the application.
+# In our application there are 4 containers:
+# 1. db - database 
+# 2. server - api
+# 3. updateprocess 
+# 4. watchdog 
+
+services:
+  db:
+
+    # By default we cannot reach the database in our container. With this port mapping we can patch through access to the database. 
+    # If we go to localhost:3306 then the host (where Docker runs) puts the connection through to the network within the container to port 3306; 
+    # which is where our database runs.
+    ports:
+    # These are ports used to connetct to DB.
+
+      - 3306:3306
+      - 33060:33060
+
+
+    # The volumes directive mounts source directories or volumes from your computer at target paths inside the container. 
+    # If a matching target path exists already as part of the container image, it will be overwritten by the mounted path.
+    volumes:
+
+    # Now DB is outside of container, its permament, due to it, if you rebuild container DB stays the same
+    # If you would like to generate DB from scratch you would have to delete this ./volumes/folder by hand 
+    # and rerun docker-compose
+      - ./volumes/mysql:/var/lib/mysql
+
+  server:
+
+    #  Enviroment directive are settings for the container.
+    environment:
+      # This line tells container where is the config file for server part
+      - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
+      
+      # Uncomment this one if you want to disable authorization by using Access Token
+      - DISABLE_ACCESS_TOKEN=true
+
+      # Uncomment this one if you want to debug server container
+      # - DEBUG_SPRING_BOOT=true
+
+
+    volumes:
+
+      # Mount persistent experiment data to your container 
+      # remember to copy data to this folder!
+      - ./volumes/imasdb:/home/imas/public/imasdb
+
+      # You can mount it elsewhere on your host, e.g outside of repo folder, 
+      # thanks to this aproach data can be in one place and be mounted to diffrent containers
+      # You dont have to copy data inside repo ./volumes folder every time you download repo
+      # example path on your host : path to conatiner
+      # ~/workspace/experiment_data/:/home/imas/public/imasdb
+ 
+
+      # Mount SSL certificate to your container if you want to use one
+      - ./volumes/cert:/home/imas/cert
+
+
+      # If you want to change some server settings in application.properties file, 
+      # you dont have dig in catalog-qt-2 repo and the rebuild whole docker
+      # all you have to do is create folder ./volumes/server-properties (if doesn't exists yet) 
+      # and then create or copy application.properties file to this server-properties folder 
+      # change it as yo like, and rerun docker with ./run.sh script! (saves a lot of time) 
+      - ./volumes/server-properties:/home/imas/server-properties
+
+
+      # If you would like to develop codes of catalog_qt_2, 
+      # the easiest option is to mount your codes from host to container
+      # catalog_qt_2 repo must be outside of catalogue_qt_docker repo!
+      # If you make changes in codes, please remeber to recompile repo EVERYTIME!
+      # in catalog_qt_2/server the are 2 files, that needs to be run:
+      # ./clean.sh -> to get rid of cache
+      # ./compile.sh -> to compile solution, changes are seen now
+      # If changes aren't seen, please remove container and rerun  ./run.sh
+      # - /path/to/your/directory/catalog_qt_2/server/catalog-ws-server:/catalog_qt_2/server/catalog-ws-server 
+   
+      
+      # ports:       
+    #   - 32889:32889  # DEBUG PORT
+
+  updateprocess:
+    environment:
+      # Uncomment this one if you want to disable authorization by using Access Token
+      - DISABLE_ACCESS_TOKEN=true
+
+      # Uncomment this one if you want to debug server container
+      # - DEBUG_UPDATE_PROCESS=true
+
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+
+    # ports:
+      # - 32888:32888 # DEBUG PORT
+
+  watchdog:
+    environment:
+     # Uncomment this one if you want to disable authorization by using Access Token
+      - DISABLE_ACCESS_TOKEN=true
+
+    # Uncomment this one if you want to debug server container
+    #   - DEBUG_IMAS_WATCHDOG=true
+
+    volumes:
+      - ./volumes/imasdb:/home/imas/public/imasdb
+      - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
+
+    # ports:
+    #   - 32887:32887 # DEBUG PORT
+
