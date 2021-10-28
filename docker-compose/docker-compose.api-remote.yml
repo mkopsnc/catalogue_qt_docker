@@ -16,7 +16,11 @@ services:
       - 8080:8080
       - 8443:8443
     volumes:
-      - /media/external-volume/experiment_data:/home/imas/public/imasdb
+    #for scilla this is pwd for data
+      # - /media/external-volume/experiment_data:/home/imas/public/imasdb
+
+    #for chara this is pwd for data 
+      - ~/experiment_data:/home/imas/public/imasdb
       - ./volumes/server-properties:/home/imas/server-properties
       - ./volumes/cert:/home/imas/cert
 
@@ -25,13 +29,23 @@ services:
     depends_on:
       - server
     volumes:
-      - /media/external-volume/experiment_data:/home/imas/public/imasdb
+    #for scilla this is pwd for data
+      # - /media/external-volume/experiment_data:/home/imas/public/imasdb
+
+    #for chara this is pwd for data 
+      - ~/experiment_data:/home/imas/public/imasdb
+
 
   watchdog:
     image: catalogqt/watchdog
     depends_on:
       - server
     volumes:
+    #for scilla this is pwd for data
+    # - /media/external-volume/experiment_data:/home/imas/public/imasdb
+
+    #for chara this is pwd for data 
+      - ~/experiment_data:/home/imas/public/imasdb
       - /media/external-volume/experiment_data:/home/imas/public/imasdb
       - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
 ~                                                                            
