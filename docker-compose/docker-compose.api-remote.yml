@@ -47,5 +47,4 @@ services:
     #for chara this is pwd for data 
       - ~/experiment_data:/home/imas/public/imasdb
       - /media/external-volume/experiment_data:/home/imas/public/imasdb
-      - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d
-~                                                                            
+      - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d                                                                          
