@@ -15,9 +15,11 @@ services:
     ports:
       - 8080:8080
       - 8443:8443
-    volumes:
+ 
     environment:
       - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
+      
+    volumes:
     #for scilla this is pwd for data
       # - /media/external-volume/experiment_data:/home/imas/public/imasdb
 
