@@ -2,11 +2,14 @@ version: "3.6"
 
 services:
   react:
+    image: rhus-71.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
     environment:
+      - LISTEN_PORT=9100
+      - S6_READ_ONLY_ROOT=1
       - MAIN_DOMAIN=chara-47.man.poznan.pl
       - AUTH_CLIENT_ID=chara-47.man.poznan.pl/dashboard
       - AUTH_CLIENT_SECRET=78aca4a2-c10d-44ee-b847-0a3dacffc34b
       - AUTH_OPENID_PROVIDER=https://sso.apps.paas-dev.psnc.pl/auth/realms/fair4fusion-docker-demo
-      - CATALOG_QT_API_URL=https:chara-47.man.poznan.pl:8443/
+      - CATALOG_QT_API_URL=https://chara-47.man.poznan.pl:8443/
     ports:
       - 9100:9100

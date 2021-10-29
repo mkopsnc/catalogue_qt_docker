@@ -16,6 +16,8 @@ services:
       - 8080:8080
       - 8443:8443
     volumes:
+    environment:
+      - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
     #for scilla this is pwd for data
       # - /media/external-volume/experiment_data:/home/imas/public/imasdb
 
@@ -46,5 +48,4 @@ services:
 
     #for chara this is pwd for data 
       - ~/experiment_data:/home/imas/public/imasdb
-      - /media/external-volume/experiment_data:/home/imas/public/imasdb
       - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d                                                                          
