@@ -15,7 +15,7 @@ Note that this container should be used only for research purposes. You need acc
 > cd docker-compose/build
 > ./build.sh
 > cd ..
-> ./run.sh -s api-noauth
+> ./run.sh -s api-noauth -s ui-noauth
 ```
 
 ***
@@ -100,11 +100,17 @@ In order to build and run container you have to do following
 Catalogue QT 2 Docker can be run using multiple configurations. By default we provide following configurations
 
 ```
-api-allconf    - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
-api-production  - configured for production Keycloak instance (eduTEAMS)
-api-development - configured for development based Keycloak instance (user:pass - demo001:demo001)
-api-debug       - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
-api-noauth     - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
+api-allconfig.yml - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
+api-debug.yml - - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
+api-development.yml - configured for development based Keycloak instance (user:pass - demo001:demo001)
+api-noauth.yml - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
+api-production.yml - configured for production Keycloak instance (eduTEAMS)
+api-remote.yml - configuration for instalation on remote machines
+ui-auth.yml - ui with kyecloak and TLS authentication
+ui-debug.yml - 
+ui-noauth.yml - ui without any authentication, for local instalation
+ui-remote-chara.yml - configuration for instalation on remote machines
+  
 ```
 
 You can run given configuration by calling
@@ -112,7 +118,11 @@ You can run given configuration by calling
 ```
 > cd docker-compose
 # ./run.sh -s <configuration file suffix> e.g.
-> ./run.sh -s noauth
+```
+The most basic execution of our Catalog QT 2 on local machine is:
+
+```
+> ./run.sh -s api-noauth -s ui-noauth
 ```
 
 To access our application please paste this urls in your browser:
