@@ -1,0 +1,15 @@
+version: "3.6"
+services:
+  proxy:
+    image: nginx
+    volumes:
+      - ./volumes/nginx-nossl:/etc/nginx/conf.d:ro
+    ports:
+      - 80:80
+    depends_on:
+      - server
+      - react
+
+  react:
+    environment:
+      - CATALOG_QT_API_URL=http://localhost/api
