@@ -2,7 +2,7 @@
 
 This container is desined to simplify installation of Catalogue QT and it's components. Instead of installing it on `IMAS` compatible platform you can use it on virtually any machine.
 
-# Known limitations
+## Known limitations
 
 Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Dashboard-ReactJS source repositories.
 
@@ -15,11 +15,11 @@ Note that this container should be used only for research purposes. You need acc
 > cd docker-compose/build
 > ./build.sh
 > cd ..
-> ./run.sh -s api-noauth -s ui-noauth
+> ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
 ```
 
 ***
-# Prepare your work environment
+# Local installation
 
 In order to build this container, you will need access to few repositories. This container is based on:
 
@@ -27,6 +27,7 @@ In order to build this container, you will need access to few repositories. This
 - `catalog_qt_2`
 - `dashboard-ReactJS`
 - `imas-watchdog`
+- `nginx`
 
 
 ## Make sure you can access imas/ual
@@ -106,11 +107,12 @@ api-development.yml - configured for development based Keycloak instance (user:p
 api-noauth.yml - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
 api-production.yml - configured for production Keycloak instance (eduTEAMS)
 api-remote.yml - configuration for instalation on remote machines
+proxy-noauth.yml - reverse-proxy configuration without SSL, which enables unsecured UI in webbrowser
+proxy-auth-chara.yml - reverse-proxy configuration with SSL, which enable secured UI in webbrowser
 ui-auth.yml - ui with kyecloak and TLS authentication
 ui-debug.yml - 
 ui-noauth.yml - ui without any authentication, for local instalation
-ui-remote-chara.yml - configuration for instalation on remote machines
-  
+ui-remote-chara.yml - configuration for instalation on remote machines  
 ```
 
 You can run given configuration by calling
@@ -119,10 +121,12 @@ You can run given configuration by calling
 > cd docker-compose
 # ./run.sh -s <configuration file suffix> e.g.
 ```
+
+
 The most basic execution of our Catalog QT 2 on local machine is:
 
 ```
-> ./run.sh -s api-noauth -s ui-noauth
+> ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
 ```
 
 To access our application please paste this urls in your browser:
@@ -133,7 +137,7 @@ To access our application please paste this urls in your browser:
 ***
 # Configuration
 
-### Docker-compose Configuration
+## Docker-compose Configuration
 
 **Note!** If you're not familiar with docker enviroment, please remember that building and running are diffrent!     
 If you have already build container, you can change some of the configuration of containers without rebulding whole docker, which save a lot of time.  
@@ -150,7 +154,7 @@ Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it
 ```
 
 
-### Catalog QT 2 Web Services Configuration
+## Catalog QT 2 Web Services Configuration
 
 Moreover, in our `catalog-ws-server` we have `application.properties` file, which is a configuration for our Web Services in Springboot.
 The explanation of this file is described here https://docs.psnc.pl/display/WFMS/Administration section `4.5.2.1. Anatomy of application.properties file`
@@ -253,7 +257,48 @@ If anything goes wrong, please delete all the `.populate` files by executing thi
 And then try to import data again.
 ***
 
-# Setting up an SSL certificate
+
+
+
+# Remote installation
+
+You can use our codes on remote host machine in two ways:
+- without any authentication
+- with TLS/SSL authentication
+
+**Note!**  Get a domain! This would be the best, instead of using an IP adress.
+
+Our domain name for remote installation is: **chara-47.man.poznan.pl**
+
+If you want to use it without authentication:
+ - download, configure and build as said above
+ - open 8080, 9100 ports to the ouside world on your host machine if aren't opened yet
+
+Otherwise, if you want to use is in secured mode, please do so:
+- open 8080, 9100 and 8443 ports on your remote host machine
+- set up SSL certificate
+- move certificates to docker volume
+
+
+## Opening ports
+
+On linux machine you could use `iptables` tool open particular ports e.g:
+```
+iptables -I INPUT 1 -i eth0 -p tcp --dport 8080 -j ACCEPT  #open 808/tcp port
+service iptables save  #save rule
+service iptables restart  #restart service 
+```
+
+To list which ports are opened run the below command
+```
+iptables -L
+```
+
+
+## Setting up an SSL certificate
+
+**Note!** Remember - to obtain an SSL certificate you must have a domain!
+
 The best way to obtain an SSL certificate is to use certbot. You can get certbot in multiple ways described https://certbot.eff.org/docs/install.html.
 
 After installation, you need to obtain the raw `.pem` certificate and convert it to `.p12`. Do this by running 
@@ -282,6 +327,112 @@ server.ssl.key-store-password="password to keystore.p12 file"
 
 Congratulations! You have set up an SSL certificate!
 
+## Moving SSL certificates /volumes/certs  
+
+Firstly, create a directory
+```
+cd catalogue_qt_docker/docker-compose/volumes
+mkdir certs
+```
+Then go to your `/etc/letsencrypt/live/name_of_your_domain` and execute:
+ ```
+ > ll
+ -rw-r--r-- 1 root root  692 Oct 13 08:30 README
+lrwxrwxrwx 1 root root   46 Oct 28 21:21 cert.pem -> ../../archive/name_of_your_domain/cert3.pem
+lrwxrwxrwx 1 root root   47 Oct 28 21:21 chain.pem -> ../../archive/name_of_your_domain/chain3.pem
+lrwxrwxrwx 1 root root   51 Oct 28 21:21 fullchain.pem -> ../../archive/name_of_your_domain/fullchain3.pem
+-rw------- 1 root root 5.7K Oct 28 21:22 keystore.p12
+lrwxrwxrwx 1 root root   49 Oct 28 21:21 privkey.pem -> ../../archive/name_of_your_domain/privkey3.pem
+
+ ```
+As you can see these are soft links to proper certificates file. 
+In this case these files have numbers in its name (number of last renewed certificate).
+
+To properly mount our cert files to docker container, we need to copy those files to our `/volumes/certs`, **not symlinks**.
+We need to copy 3 files:
+- keystore.p12
+- cert3.pem
+- privkey3.pem
+
+```
+cp archive/domain-name/keystore.p12 ~/catalogue_qt_docker/docker-compose/volumes/cert
+cp archive/domain-name/cert3.pem ~/catalogue_qt_docker/docker-compose/volumes/cert
+cp archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes/cert
+```
+
+## Reverse-Proxy configuration with nginx 
+
+Reverse proxy enables us to properly distinguish urls and ports in our containerized enviroment.
+
+### volumes/nginx-ssl-chara
+
+**Note!**Please update names of cert files, to be the same as the ones in `/volumes/certs`
+```
+server {
+    listen 443 ssl;
+    server_name your_domain_name;
+    ssl_certificate /etc/nginx/certs/cert3.pem; 
+    ssl_certificate_key /etc/nginx/certs/privkey3.pem;
+    
+..... rest stays the same ....
+
+}
+
+```
+
+
+### docker-compose.proxy-ssl-chara.yml
+```
+version: "3.6"
+services:
+  proxy:
+    image: nginx
+    volumes:
+    
+    #This is our directory for nginx configuration
+      - ./volumes/nginx-ssl-chara:/etc/nginx/conf.d:ro
+      
+     #This is where our certs are mounted 
+      - ./volumes/certs:/etc/nginx/certs:ro
+    ports:
+      - 443:443
+    depends_on:
+      - server
+      - react
+
+  react:
+    environment:
+    #This is our domain name 
+      - CATALOG_QT_API_URL=https://domain_name/api
+```
+
+
+### docker-compose.api-remote.yml
+Please open (or copy and rename) this file and configure with proper monuting folders for your experiment data!
+
+
+
+So now you are ready to run Catalog QT 2 on remote host!
+
+- without SSL/TLS
+```
+./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
+```
+http://chara-47.man.poznan.pl/dashboard/
+
+
+
+
+- with SSL/TLS enabled
+```
+./run.sh -s api-remote -s ui-auth -s proxy-auth
+
+```
+https://chara-47.man.poznan.pl/dashboard/
+
+You will see login page. You can login with:
+`(user:pass - demo001:demo001)`
+or your LDAP account.
 
 
 # Developer informations
