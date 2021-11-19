@@ -26,7 +26,7 @@ services:
     #for chara this is pwd for data 
       - ~/experiment_data:/home/imas/public/imasdb
       - ./volumes/server-properties:/home/imas/server-properties
-      - ./volumes/cert:/home/imas/cert
+      - ./volumes/certs:/home/imas/cert
 
   updateprocess:
     image: catalogqt/updateprocess
