@@ -3,13 +3,13 @@ services:
   proxy:
     image: nginx
     volumes:
-      - ./volumes/nginx:/etc/nginx/conf.d:ro
+      - ./volumes/nginx-nossl:/etc/nginx/conf.d:ro
     ports:
-      - 8000:8000
+      - 80:80
     depends_on:
       - server
       - react
 
   react:
     environment:
-      - CATALOG_QT_API_URL=http://localhost:8000/api
+      - CATALOG_QT_API_URL=http://localhost/api
