@@ -8,6 +8,8 @@ Note that this container should be used only for research purposes. You need acc
 
 ***
 
+
+
 **Note!** If you are installing our docker for the first time please go to the next section of this documentation. Otherwise you have access to all of our repositories and can build docker easily as follows: 
 
 ```
@@ -18,6 +20,13 @@ Note that this container should be used only for research purposes. You need acc
 > ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
 ```
 
+## Table of contents
+* [Local installation](#local-installation)
+* [Configuration](#configuration)
+* [Remote installation](#remote-installation)
+* [Developer informations](#developer-informations)
+* [Container dependencies](#container-dependencies)
+* [Troubleshooting download issues inside Docker](#troubleshooting-download-issues-inside-docker)
 ***
 # Local installation
 
@@ -272,7 +281,7 @@ Our domain name for remote installation is: **chara-47.man.poznan.pl**
 
 If you want to use it without authentication:
  - download, configure and build as said above
- - open 8080, 9100 ports to the ouside world on your host machine if aren't opened yet
+ - make sure you have opened 80 and 443 ports to the ouside world on your host machine,
 
 Otherwise, if you want to use is in secured mode, please do so:
 - open 8080, 9100 and 8443 ports on your remote host machine
@@ -282,18 +291,33 @@ Otherwise, if you want to use is in secured mode, please do so:
 
 ## Opening ports
 
-On linux machine you could use `iptables` tool open particular ports e.g:
-```
-iptables -I INPUT 1 -i eth0 -p tcp --dport 8080 -j ACCEPT  #open 808/tcp port
-service iptables save  #save rule
-service iptables restart  #restart service 
-```
+On linux machine you could use `iptables` tool open particular ports.
 
 To list which ports are opened run the below command
 ```
 iptables -L
 ```
 
+If these ports aren't open run the following command to allow traffic on port 80:
+```
+sudo iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+```
+
+Run the following command to allow traffic on port 443:
+```
+sudo iptables -I INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+```
+
+Run the following command to save the iptables rules:
+```
+sudo service iptables save
+```
+
+
+Use the following one-line command to open the open the firewall ports:
+```
+sudo sh -c "iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT && iptables -I INPUT -p tcp -m tcp --dport 443 -j ACCEPT && service iptables save"
+```
 
 ## Setting up an SSL certificate
 
