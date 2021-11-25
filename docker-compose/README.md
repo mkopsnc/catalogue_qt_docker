@@ -113,7 +113,7 @@ The most basic execution of our Catalog QT 2 on local machine is:
 
 To access our application please paste this urls in your browser:
 
-http://localhost/api/swagger-ui.html#/ to access Web Services via Swagger based UI.
+http://localhost/api/swagger-ui.html#/ to access Web Services via Swagger based UI.  
 http://localhost/dashboard/ to access User-friendly Interface
 
 ***
