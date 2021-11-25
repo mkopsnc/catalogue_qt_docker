@@ -63,6 +63,18 @@ This repository is publicly available. All you have to do, is to double check wh
 > git clone --single-branch master https://github.com/tzok/imas-watchdog.git
 ```
 
+## Make sure you have proper `/etc/hosts/`
+
+Your `/etc/hosts/` must have this line in it for proper collaboration with Keycloak  
+```
+ > cat /etc/hosts
+# Host addresses
+127.0.0.1  localhost.dashboard-ui.pl
+...
+
+```
+
+
  *** 
  
 # Building container
