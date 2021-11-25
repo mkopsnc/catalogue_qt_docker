@@ -1,25 +1,5 @@
 # Catalogue QT Docker
 
-This container is desined to simplify installation of Catalogue QT and it's components. Instead of installing it on `IMAS` compatible platform you can use it on virtually any machine.
-
-## Known limitations
-
-Note that this container should be used only for research purposes. You need access to Catalogue QT v.2 and Dashboard-ReactJS source repositories.
-
-***
-
-
-
-**Note!** If you are installing our docker for the first time please go to the next section of this documentation. Otherwise you have access to all of our repositories and can build docker easily as follows: 
-
-```
-> git clone https://github.com/mkopsnc/catalogue_qt_docker.git
-> cd docker-compose/build
-> ./build.sh
-> cd ..
-> ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
-```
-
 ## Table of contents
 * [Local installation](#local-installation)
 * [Configuration](#configuration)
@@ -60,13 +40,6 @@ Before you proceed, make sure you can access the registry. You can test it by ex
 ```
 > docker login registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
 ```
-
-**Note!** Running Dashboard locally requires an entry inside `/etc/hosts`
-
-```
-127.0.0.1       localhost.dashboard-ui.pl
-```
-
 
 
 ## Make sure you can access catalog_qt_2
@@ -140,8 +113,8 @@ The most basic execution of our Catalog QT 2 on local machine is:
 
 To access our application please paste this urls in your browser:
 
-- [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
-- [http://localhost.dashboard-ui.pl:9100/dashboard/](http://localhost.dashboard-ui.pl:9100/dashboard/) to access Dashboard-ReactJS
+http://localhost/api/swagger-ui.html#/ to access Web Services via Swagger based UI.
+http://localhost/dashboard/ to access User-friendly Interface
 
 ***
 # Configuration
@@ -160,7 +133,11 @@ To do so open configutation file `docker-compose._deployment_name_.yml` and chan
 Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it!
 ```
 > ./run.sh -s myconf
-```
+```  
+
+
+ **Please look at `docker-compose.allconfig.yml` to see all avaiable configurations**  
+
 
 
 ## Catalog QT 2 Web Services Configuration
@@ -281,12 +258,12 @@ Our domain name for remote installation is: **chara-47.man.poznan.pl**
 
 If you want to use it without authentication:
  - download, configure and build as said above
- - make sure you have opened 80 and 443 ports to the ouside world on your host machine,
+ - make sure you have opened 80 portto the ouside world on your host machine,
 
 Otherwise, if you want to use is in secured mode, please do so:
-- open 8080, 9100 and 8443 ports on your remote host machine
 - set up SSL certificate
 - move certificates to docker volume
+- make sure you have opened 443 port to the ouside world on your host machine
 
 
 ## Opening ports
@@ -442,6 +419,11 @@ So now you are ready to run Catalog QT 2 on remote host!
 ```
 ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
 ```
+http://your-domain-name/dashboard/  
+https://your-domain-name/api/swagger-ui.html/  
+
+
+http://chara-47.man.poznan.pl/api/swagger-ui.html  
 http://chara-47.man.poznan.pl/dashboard/
 
 
@@ -452,6 +434,10 @@ http://chara-47.man.poznan.pl/dashboard/
 ./run.sh -s api-remote -s ui-auth -s proxy-auth
 
 ```
+https://your-domain-name/dashboard/  
+https://your-domain-name/api/swagger-ui.html/  
+  
+https://chara-47.man.poznan.pl/api/swagger-ui.html  
 https://chara-47.man.poznan.pl/dashboard/
 
 You will see login page. You can login with:
