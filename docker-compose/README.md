@@ -143,7 +143,78 @@ Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it
 ## Catalog QT 2 Web Services Configuration
 
 Moreover, in our `catalog-ws-server` we have `application.properties` file, which is a configuration for our Web Services in Springboot.
-The explanation of this file is described here https://docs.psnc.pl/display/WFMS/Administration section `4.5.2.1. Anatomy of application.properties file`
+
+### Anatomy of `application.properties`
+```
+# location of database - typically, it will point at localhost, but
+# it's also possible to change location of MySQL server.
+# Docker based installation (docker-compose) will change it to db:3306
+# In case of docker-compose based installation, MySQL is visible as another host
+# Note that you don't have to change anything
+spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
+
+# Default user name and password for database connection. Note that this connection
+# will not work (by default) for external hosts. This is why we don't quite care about
+# user/pass - however, you can alter these and make sure they don't contain default values
+spring.datasource.username=itm_catalog_rw
+spring.datasource.password=itm_catalog_rw
+spring.jpa.properties.hibernate.jdbc.time_zone=UTC
+
+# In case of errors we want to embed error message as well (so we better know what went wrong)
+server.error.include-message=always
+
+# We definitely don't want to log SQL queries. However, if you want to see them, feel free
+# to enable this property
+spring.jpa.show-sql=false
+
+# We don't want to generate DB schema from bean classes
+spring.jpa.hibernate.ddl-auto=none
+
+# This is additional http handler, on another port
+# We need this one, in case we plan to use https
+
+# This is tricky :)
+# If server.ssl fields are set, this field defines https port
+# If server.ssl fields are not set, this field defines http port
+server.port=8080
+
+# However, we need http port anyway (for some components). This is why we expose services on
+# http anyway. At the and we can end up with two different configurations
+# http  (8080) and http (8081) - no certificates
+# https (8443) and http (8081) - certificates 
+server.http.port=8081
+server.http.interface=0.0.0.0
+
+# ------- Keycloak settings -------
+
+keycloak.enabled=true
+
+keycloak.realm = fair4fusion-docker-demo
+keycloak.auth-server-url=https://sso.apps.paas-dev.psnc.pl/
+keycloak.resource= catalogqt-cli
+keycloak.realm-key= MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjOCDGJsBi7rxVjf0RQb8pm0LAGsEKFcH7g7mKSqpFvp1uOypUeiYe5dwlwkXAXaYeYs0J70LB8E6mtVUcykbmp+XrqD1nn3yfPxlVLSg7iCvJqMUq8udsUbsyT3M/32/kssXurgY7rX5JhdtkYeAgq+9ifIjLQZhALg+FvEsX9C+D30WQDAChEljlReb+Y4UTz2aIqz9C+90bqG1ZIX4o3Dli1PZDosTNM444CwDTbrFrenctOTDtGPodo9k2jze8McZFAIrdUYi9mKD8v0frs8NUUW/TQj9h62swXdvVAfzYTd+R7aMRG0eXMV3rJc38DfsCsF7bkqSg0b4l8GcaQIDAQAB
+keycloak.bearer-only = true
+keycloak.public-client=true
+keycloak.principal-attribute=preferred_username
+
+spring.mvc.dispatch-options-request=true
+
+# ------- HTTPS settings --------
+
+# If you plan to use HTTPS, make sure to uncomment this one
+# You have to make sure to generate and configure SSL certificate for your domain
+#server.ssl.key-store=file:///home/imas/cert/keystore.p12
+#server.ssl.key-store-password=catalogqt
+#server.ssl.keyStoreType=PKCS12
+#server.ssl.keyAlias=tomcat
+
+# ------- Bearer token authorization --------
+
+# Should we check authorization header or not. This feature toggle enables sort of "single user mode"
+# It's useful in case you don't have Keycloak and don't care about user roles. Once set to "false"
+# it will make Web Services behave as if there is only one user
+swagger-ui.authorization.header=true
+```
 
 The default configuration is inside our project, but (before building) if you want to use a diffrent configuration (e.g enabling SSL certificates, or changing ports) you can paste in folder `/catalogue_qt_docker/docker-compose/build/files/server` another `application.properties` file, which will have higher priority and would override existing file in source codes and then you can build and run our docker.
 
@@ -328,7 +399,7 @@ server.ssl.key-store-password="password to keystore.p12 file"
 
 Congratulations! You have set up an SSL certificate!
 
-## Moving SSL certificates /volumes/certs  
+## Moving SSL certificates to `/volumes/certs`  
 
 Firstly, create a directory
 ```
@@ -365,7 +436,7 @@ cp archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes
 
 Reverse proxy enables us to properly distinguish urls and ports in our containerized enviroment.
 
-### volumes/nginx-ssl-chara
+### `volumes/nginx-ssl-chara`
 
 **Note!**Please update names of cert files, to be the same as the ones in `/volumes/certs`
 ```
@@ -382,7 +453,7 @@ server {
 ```
 
 
-### docker-compose.proxy-ssl-chara.yml
+### `docker-compose.proxy-ssl-chara.yml`
 ```
 version: "3.6"
 services:
@@ -408,7 +479,7 @@ services:
 ```
 
 
-### docker-compose.api-remote.yml
+### `docker-compose.api-remote.yml`
 Please open (or copy and rename) this file and configure with proper monuting folders for your experiment data!
 
 
