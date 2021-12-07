@@ -13,7 +13,7 @@ services:
       - DEBUG_SPRING_BOOT=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
-      - ./volumes/cert:/home/imas/cert
+      - ./volumes/certs:/home/imas/cert
     ports:
       - 32889:32889
 

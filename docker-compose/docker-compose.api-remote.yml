@@ -20,11 +20,7 @@ services:
       - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
       
     volumes:
-    #for scilla this is pwd for data
-      # - /media/external-volume/experiment_data:/home/imas/public/imasdb
-
-    #for chara this is pwd for data 
-      - ~/experiment_data:/home/imas/public/imasdb
+      - ./volumes/imasdb:/home/imas/public/imasdb 
       - ./volumes/server-properties:/home/imas/server-properties
       - ./volumes/certs:/home/imas/cert
 
@@ -33,11 +29,7 @@ services:
     depends_on:
       - server
     volumes:
-    #for scilla this is pwd for data
-      # - /media/external-volume/experiment_data:/home/imas/public/imasdb
-
-    #for chara this is pwd for data 
-      - ~/experiment_data:/home/imas/public/imasdb
+      - ./volumes/imasdb:/home/imas/public/imasdb
 
 
   watchdog:
@@ -45,9 +37,5 @@ services:
     depends_on:
       - server
     volumes:
-    #for scilla this is pwd for data
-    # - /media/external-volume/experiment_data:/home/imas/public/imasdb
-
-    #for chara this is pwd for data 
-      - ~/experiment_data:/home/imas/public/imasdb
+      - ./volumes/imasdb:/home/imas/public/imasdb
       - ./volumes/fair4fusion-docker-demo:/docker-entrypoint-properties.d                                                                          

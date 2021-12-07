@@ -6,13 +6,13 @@ services:
       - DISABLE_ACCESS_TOKEN=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
+      - ./volumes/certs:/home/imas/cert
 
   updateprocess:
     environment:
       - DISABLE_ACCESS_TOKEN=true
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb
-
   watchdog:
     environment:
       - DISABLE_ACCESS_TOKEN=true
