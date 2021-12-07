@@ -58,9 +58,9 @@ services:
       # remember to copy data to this folder!
       - ./volumes/imasdb:/home/imas/public/imasdb
 
-      # You can mount it elsewhere on your host, e.g outside of repo folder, 
-      # thanks to this aproach data can be in one place and be mounted to diffrent containers
-      # You dont have to copy data inside repo ./volumes folder every time you download repo
+      # If you mount data in folder that is inside `catalogue_qt_docker` the data can be lost if you delete repo. 
+      # To avoid this, you can have external folder with data outside repo, and mount to docker.
+      # Thanks to it, you don't have to copy data everytime after downloading `catalogue_qt_docker`
       # example path on your host : path to conatiner
       # ~/workspace/experiment_data/:/home/imas/public/imasdb
  
