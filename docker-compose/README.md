@@ -1,10 +1,22 @@
 # Catalogue QT Docker
 
 ## Table of contents
-* [Local installation](#local-installation)
+* [Local installation](#local-installation)    
+  * [Access to repositories](#access-to-repositories)
+  * [Building container](#building-container)
+  * [Starting container](#starting-container)
 * [Configuration](#configuration)
+  * [Keycloak](#keycloak)
+  * [Catalog QT 2 Web Services Configuration](#catalog-qt-2-web-services-configuration)
+  * [Docker-compose Configuration](#docker-compose-configuration)
+    * [Importing data from pulse file](#importing-data-from-pulse-file)
+    * [Adding persistent storage](#adding-persistent-storage)
 * [Remote installation](#remote-installation)
-* [Developer informations](#developer-informations)
+  * [Opening ports](#opening-ports)
+  * [Setting up a SSL certificate](#setting-up-a-ssl-certificate)
+  * [Reverse-Proxy SSL configuration with nginx](#reverse-proxy-ssl-configuration-with-nginx)
+  * [Starting container as server](#starting-container-as-server) 
+* [Debugging in docker-compose](#debugging-in-docker-compose)
 * [Container dependencies](#container-dependencies)
 * [Troubleshooting download issues inside Docker](#troubleshooting-download-issues-inside-docker)
 ***
@@ -19,7 +31,8 @@ In order to build this container, you will need access to few repositories. This
 - `nginx`
 
 
-## Make sure you can access imas/ual
+## Access to repositories
+### Make sure you can access imas/ual
 
 This `Catalogue Qt 2 Docker` image is based on `imas/ual` Docker image. It is available from Docker registry `rhus-71.man.poznan.pl`.
 Before you proceed, make sure you can access the registry. You can test it by executing following command
@@ -32,7 +45,7 @@ You will be asked for a user name and password. If you don't have it, contact de
 
 
 
-## Make sure you can access dashboard-ReactJS
+### Make sure you can access dashboard-ReactJS
 
 Docker image that contains Dashboard application can be downloaded from a Docker registry `registry.apps.man.poznan.pl`.
 Before you proceed, make sure you can access the registry. You can test it by executing following command
@@ -42,7 +55,7 @@ Before you proceed, make sure you can access the registry. You can test it by ex
 ```
 
 
-## Make sure you can access catalog_qt_2
+### Make sure you can access catalog_qt_2
 
 You will also need an access to `catalog_qt_2` project. Make sure you can access it. 
 To do so, please go to folder `docker-compose/build` and in there execute this command:
@@ -55,7 +68,7 @@ You will be asked for a user name and password. If you don't have it, contact de
 
 
 
-## Make sure you can access imas-watchdog project
+### Make sure you can access imas-watchdog project
 
 This repository is publicly available. All you have to do, is to double check whether you can clone it in `docker-compose/build` folder.
 
@@ -97,16 +110,13 @@ Catalogue QT 2 Docker can be run using multiple configurations. By default we pr
 ```
 api-allconfig.yml - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
 api-debug.yml - - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
-api-development.yml - configured for development based Keycloak instance (user:pass - demo001:demo001)
 api-noauth.yml - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
-api-production.yml - configured for production Keycloak instance (eduTEAMS)
 api-remote.yml - configuration for instalation on remote machines
-proxy-noauth.yml - reverse-proxy configuration without SSL, which enables unsecured UI in webbrowser
-proxy-auth-chara.yml - reverse-proxy configuration with SSL, which enable secured UI in webbrowser
+proxy-noauth.yml - reverse-proxy configuration without SSL, which disables secured UI in webbrowser
+proxy-auth-domain.yml - reverse-proxy configuration with SSL, which enable secured UI in webbrowser for particular domain
 ui-auth.yml - ui with kyecloak and TLS authentication
-ui-debug.yml - 
-ui-noauth.yml - ui without any authentication, for local instalation
-ui-remote-chara.yml - configuration for instalation on remote machines  
+ui-noauth.yml - ui without any authorization, for local instalation
+ui-remote-chara.yml - configuration for instalation on remote chara machine with its own keycloak instance  
 ```
 
 You can run given configuration by calling
@@ -131,26 +141,11 @@ http://localhost/dashboard/ to access User-friendly Interface
 ***
 # Configuration
 
-## Docker-compose Configuration
+## Keycloak
 
-**Note!** If you're not familiar with docker enviroment, please remember that building and running are diffrent!     
-If you have already build container, you can change some of the configuration of containers without rebulding whole docker, which save a lot of time.  
-To do so open configutation file `docker-compose._deployment_name_.yml` and change if you wish:
-
-- The path where MySQL will store the data (default: `$(pwd)/db-data`)
-- The path where pulsefiles are stored on the host (default: `$(pwd)/imasdb`)
-- To map MySQL port to host port, so you can access the database from the container (by deafult no ports are exposed)
-- To add custom configuration of Web Services: `application.properties` file  
-
-Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it!
-```
-> ./run.sh -s myconf
-```  
-
-
- **Please look at `docker-compose.allconfig.yml` to see all avaiable configurations**  
-
-
+Keycloak is an open-source user authentication and authorization server.  
+If you want to integrate Catalog QT installation with Keycloak, you have to make sure to have it installed and configured.   
+For basic usage and testing purposes we suggest using  single user mode installation.
 
 ## Catalog QT 2 Web Services Configuration
 
@@ -251,21 +246,28 @@ After changing the settings, it may be necessary to restart from scratch:
 > docker-compose up
 ```
 
-*** 
-## Adding persistent storage
+***
+## Docker-compose Configuration
 
-You can add persistent storage by setting it up inside `docker-compose.yml` file
+**Note!** If you're not familiar with docker enviroment, please remember that building and running are diffrent!     
+If you have already build container, you can change some of the configuration of containers without rebulding whole docker, which save a lot of time.  
+To do so open configutation file `docker-compose._deployment_name_.yml` and change if you wish:
 
+- The path where MySQL will store the data (default: `$(pwd)/db-data`)
+- The path where pulsefiles are stored on the host (default: `$(pwd)/imasdb`)
+- To map MySQL port to host port, so you can access the database from the container (by deafult no ports are exposed)
+- To add custom configuration of Web Services: `application.properties` file  
+
+Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it!
 ```
-services:
-  db:
-    volumes:
-      - ./volumes/mysql:/var/lib/mysql
-```
+> ./run.sh -s myconf
+```  
 
-It is not required to link `./volumes/mysql` location. In case you are using some other location for persistent data, feel free to use it instead.
 
-## Importing data from pulse file
+ **Please look at `docker-compose.allconfig.yml` to see all avaiable configurations**  
+
+
+### Importing data from pulse file
 
 Catalog QT Demonstrator allows to import MDSPlus based data automatically into SQL database. In order to do this you have to bind mount a volume. In a plain text it means that you have to tell Docker that you want to make your local filesystem to be available inside Docker container. Easiest way to do it is to create directory (or symbolic link) to a MDSPlus compatible local database.
 
@@ -323,10 +325,45 @@ If anything goes wrong, please delete all the `.populate` files by executing thi
 ```
 > find . -type f -name "*.populate" -delete  
 ```
-And then try to import data again.
-***
+And then try to import data again.  
 
 
+#### External experiment data folder
+If you mount data in folder that is inside `catalogue_qt_docker` the data can be lost if you delete repo.  
+To avoid this, you can have external folder with data outside repo, and mount to docker.  
+Thanks to it, you don't have to copy data everytime after downloading `catalogue_qt_docker`
+
+```
+.
+├── catalogue_qt_docker
+├── experiment_data
+
+```
+And then in your `docker-compose.api-<config_file>.yml` you can add:
+``` 
+
+services:
+  server:
+    volumes:
+       ~/workspace/experiment_data/:/home/imas/public/imasdb
+```
+
+
+
+
+### Adding persistent storage
+
+You can add persistent storage by setting it up inside `docker-compose.yml` file
+
+```
+services:
+  db:
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+```
+
+It is not required to link `./volumes/mysql` location. In case you are using some other location for persistent data, feel free to use it instead.  
+If you would like to generate DB from scratch you would have to delete this `./volumes/folder` by hand and rerun docker-compose
 
 
 # Remote installation
@@ -337,7 +374,7 @@ You can use our codes on remote host machine in two ways:
 
 **Note!**  Get a domain! This would be the best, instead of using an IP adress.
 
-Our domain name for remote installation is: **chara-47.man.poznan.pl**
+Our domain name for remote example machine installation is: **chara-47.man.poznan.pl**
 
 If you want to use it without authentication:
  - download, configure and build as said above
@@ -358,15 +395,12 @@ To list which ports are opened run the below command
 iptables -L
 ```
 
-If these ports aren't open run the following command to allow traffic on port 80:
+If these ports aren't open run the following command to allow traffic on port 80 and:
 ```
 sudo iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT
-```
-
-Run the following command to allow traffic on port 443:
-```
 sudo iptables -I INPUT -p tcp -m tcp --dport 443 -j ACCEPT
 ```
+
 
 Run the following command to save the iptables rules:
 ```
@@ -379,7 +413,7 @@ Use the following one-line command to open the open the firewall ports:
 sudo sh -c "iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT && iptables -I INPUT -p tcp -m tcp --dport 443 -j ACCEPT && service iptables save"
 ```
 
-## Setting up an SSL certificate
+## Setting up a SSL certificate
 
 **Note!** Remember - to obtain an SSL certificate you must have a domain!
 
@@ -411,9 +445,9 @@ server.ssl.key-store-password="password to keystore.p12 file"
 
 Congratulations! You have set up an SSL certificate!
 
-## Moving SSL certificates to `/volumes/certs`  
+### Moving SSL certificates to `/volumes/certs`  
 
-Firstly, create a directory
+Firstly, create a directory if doesn't exists
 ```
 cd catalogue_qt_docker/docker-compose/volumes
 mkdir certs
@@ -438,23 +472,26 @@ We need to copy 3 files:
 - cert3.pem
 - privkey3.pem
 
+**Note!** Of course in your case the numbers in filenames would be diffrent so remember to change them!
+
 ```
 cp archive/domain-name/keystore.p12 ~/catalogue_qt_docker/docker-compose/volumes/cert
 cp archive/domain-name/cert3.pem ~/catalogue_qt_docker/docker-compose/volumes/cert
 cp archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes/cert
 ```
 
-## Reverse-Proxy configuration with nginx 
+## Reverse-Proxy SSL configuration with nginx 
 
-Reverse proxy enables us to properly distinguish urls and ports in our containerized enviroment.
+Reverse proxy enables us to properly distinguish urls and ports in our containerized enviroment.  
+Please change this files to properly configure reverse-proxy.
 
-### `volumes/nginx-ssl-chara`
+### `volumes/nginx-ssl`
 
-**Note!**Please update names of cert files, to be the same as the ones in `/volumes/certs`
+**Note!** Please update names of cert files, to be the same as the ones in `/volumes/certs`
 ```
 server {
     listen 443 ssl;
-    server_name your_domain_name;
+    server_name your_domain_name;  #change your domain name 
     ssl_certificate /etc/nginx/certs/cert3.pem; 
     ssl_certificate_key /etc/nginx/certs/privkey3.pem;
     
@@ -465,7 +502,7 @@ server {
 ```
 
 
-### `docker-compose.proxy-ssl-chara.yml`
+### `docker-compose.proxy-auth-domain.yml`
 ```
 version: "3.6"
 services:
@@ -487,21 +524,24 @@ services:
   react:
     environment:
     #This is our domain name 
-      - CATALOG_QT_API_URL=https://domain_name/api
+      - CATALOG_QT_API_URL=https://your_domain_name/api  #change your domain name
 ```
 
 
 ### `docker-compose.api-remote.yml`
-Please open (or copy and rename) this file and configure with proper monuting folders for your experiment data!
+Please open (or copy and rename) this file and configure with proper monuting folders for your experiment data etc.
 
 
 
 So now you are ready to run Catalog QT 2 on remote host!
+***
+### Starting container as server
 
 - without SSL/TLS
 ```
 ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
-```
+```  
+
 http://your-domain-name/dashboard/  
 https://your-domain-name/api/swagger-ui.html/  
 
@@ -512,11 +552,11 @@ http://chara-47.man.poznan.pl/dashboard/
 
 
 
-- with SSL/TLS enabled
+- with SSL/TLS and if you have Keycloak enabled
 ```
 ./run.sh -s api-remote -s ui-auth -s proxy-auth
 
-```
+```  
 https://your-domain-name/dashboard/  
 https://your-domain-name/api/swagger-ui.html/  
   
@@ -527,10 +567,10 @@ You will see login page. You can login with:
 `(user:pass - demo001:demo001)`
 or your LDAP account.
 
+***
 
-# Developer informations
 
-## Debugging in docker-compose
+# Debugging in docker-compose
 
 You can debug either all the Java based components, inside Docker container, or you can specify which one should be started in debug more. For debugging Java code inside Docker containers we are using `JDWP` protocol, and by default we are using following ports
 
