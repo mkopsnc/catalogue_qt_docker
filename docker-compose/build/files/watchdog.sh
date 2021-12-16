@@ -17,4 +17,6 @@ else
   INI_FILE=imasdb-token.ini
 fi
 
+export LOG4J_FORMAT_MSG_NO_LOOKUPS = true
+
 exec ./main.py --config ${INI_FILE} --verbose
