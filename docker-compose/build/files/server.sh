@@ -18,5 +18,5 @@ fi
 
 JAR_FILE=$(ls -1 ./target/catalog-ws-server-*-SNAPSHOT.jar)
 
-export LOG4J_FORMAT_MSG_NO_LOOKUPS = true
+export LOG4J_FORMAT_MSG_NO_LOOKUPS=true
 exec java ${DEBUG_SPRING_BOOT_JDWP} -jar ${JAR_FILE}

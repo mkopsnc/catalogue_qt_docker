@@ -30,7 +30,7 @@ if [ ! -z "$DEBUG_UPDATE_PROCESS" ]; then
   fi
 fi
 
-export LOG4J_FORMAT_MSG_NO_LOOKUPS = true
+export LOG4J_FORMAT_MSG_NO_LOOKUPS=true
 
 exec java ${DEBUG_UPDATE_PROCESS_JDWP} -jar ${CLIENT_WS_JAR} \
     -startUpdateProcess \
