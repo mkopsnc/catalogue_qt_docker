@@ -7,7 +7,7 @@
   * [Starting container](#starting-container)
 * [Configuration](#configuration)
   * [Keycloak](#keycloak)
-  * [Catalog QT 2 Web Services Configuration](#catalog-qt-2-web-services-configuration)
+  * [Catalog QT 2 Configuration Files](#catalog-qt-2-configuration-files)
   * [Docker-compose Configuration](#docker-compose-configuration)
     * [Importing data from pulse file](#importing-data-from-pulse-file)
     * [Adding persistent storage](#adding-persistent-storage)
@@ -107,17 +107,17 @@ In order to build and run container you have to do following
 
 Catalogue QT 2 Docker can be run using multiple configurations. By default we provide following configurations
 
-```
-api-allconfig.yml - all avaiable configuration in one file (you can comment particular lines to disable functionalities)
-api-debug.yml - - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)
-api-noauth.yml - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)
-api-remote.yml - configuration for instalation on remote machines
-proxy-noauth.yml - reverse-proxy configuration without SSL, which disables secured UI in webbrowser
-proxy-auth-domain.yml - reverse-proxy configuration with SSL, which enable secured UI in webbrowser for particular domain
-ui-auth.yml - ui with kyecloak and TLS authentication
-ui-noauth.yml - ui without any authorization, for local instalation
-ui-remote-chara.yml - configuration for instalation on remote chara machine with its own keycloak instance  
-```
+
+- api-allconfig.yml - all avaiable configuration in one file (you can comment particular lines to disable functionalities)  
+- api-debug.yml - configured for running Docker compose in debug mode (Web Services, Update Process, Scheduler)  
+- api-noauth.yml - configured for running Docker compose in single-user mode (no tokens are used for authorization/authentication)  
+- api-remote.yml - configuration for instalation on remote machines  
+- proxy-noauth.yml - reverse-proxy configuration without SSL, which **disables** secured UI in webbrowser  
+- proxy-auth-domain.yml - reverse-proxy configuration with SSL, which **enables** secured UI in webbrowser for particular domain  
+- ui-auth.yml - UI with keycloak and TLS authentication  
+- ui-noauth.yml - UI without any authorization, for local instalation  
+- ui-remote-chara.yml - configuration for instalation on remote chara machine with its own keycloak instance    
+
 
 You can run given configuration by calling
 
@@ -147,18 +147,58 @@ Keycloak is an open-source user authentication and authorization server.
 If you want to integrate Catalog QT installation with Keycloak, you have to make sure to have it installed and configured.   
 For basic usage and testing purposes we suggest using  single user mode installation.
 
-## Catalog QT 2 Web Services Configuration
+## Catalog QT 2 Configuration Files
 
-Moreover, in our `catalog-ws-server` we have `application.properties` file, which is a configuration for our Web Services in Springboot.
+Our dockerized application consists of another independent repository - `Catalog QT 2`.
 
-### Anatomy of `application.properties`
+### Catalog QT 2
+This repository consists of *Web Services* and *Client mode* used to operate with plasma data.  
+It can be downloaded and used **seperaterly**, without docker. 
+
+
+Catalog QT 2 has its own configuration files in `catalog_qt_2/server/catalog_ws_server/src/main/resources`: 
+
+- `application.properties  -> application.properties.noauth` (the arrow means it is softlinked **at default** to the `application.properties.noauth`,  
+       **Note!** this file is used **at default**!  )
+- `application.properties.auth`
+- `application.properties.auth-cert`
+- `application.properties.noauth`
+- `uri-mapping-feeder.properties`
+- `uri-mapping-parser.properties`
+- `url.properties`
+
+
+
+This files can be easily editable at docker side.  
+All of the files above are also at deafult in  `docker-compose/volumes/server-properties`, where you can edit them as you like.   
+(You can turn on SSL, disable token verification to some URL, etc. - it is explained in next section).
+
+In your `docker-compose._deployment_name_.yml` in **server** section there should be these lines:
 ```
-# location of database - typically, it will point at localhost, but
-# it's also possible to change location of MySQL server.
-# Docker based installation (docker-compose) will change it to db:3306
-# In case of docker-compose based installation, MySQL is visible as another host
-# Note that you don't have to change anything
-spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
+server:
+  volumes:
+    - ./volumes/server-properties:/home/imas/server-properties 
+```
+
+It means that files in `/server-properties` are mapped and seen in docker,  
+where are properly injected to Cataloq QT 2 codes and they **OVERRIDE** settings in Catalog QT 2 `/resources` inside docker.
+
+If you edit some of the files, all you need to do is to rerun docker. e.g:
+
+```
+./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
+```
+
+Thanks to this approach you don't have to edit config files inside  
+`docker-compose/build/catalog_qt_2/server/catalog_ws_server/src/main/resources` folder and rebuild whole docker, which takes a lot of time.   
+Now this process is very fast and user friendly.
+
+
+
+#### Anatomy of `application.properties`
+```
+#conatiners in docker are connected via 'db' not 'localhost'
+spring.datasource.url=jdbc:mysql://db:3306/itm_catalog_qt?serverTimezone=UTC
 
 # Default user name and password for database connection. Note that this connection
 # will not work (by default) for external hosts. This is why we don't quite care about
@@ -183,13 +223,14 @@ spring.jpa.hibernate.ddl-auto=none
 # This is tricky :)
 # If server.ssl fields are set, this field defines https port
 # If server.ssl fields are not set, this field defines http port
-server.port=8080
+#HTTPS PORT
+server.port=8443
 
 # However, we need http port anyway (for some components). This is why we expose services on
 # http anyway. At the and we can end up with two different configurations
-# http  (8080) and http (8081) - no certificates
-# https (8443) and http (8081) - certificates 
-server.http.port=8081
+# http  (8081) and http (8080) - no certificates
+# https (8443) and http (8080) - certificates 
+server.http.port=8080
 server.http.interface=0.0.0.0
 
 # ------- Keycloak settings -------
@@ -223,28 +264,38 @@ spring.mvc.dispatch-options-request=true
 swagger-ui.authorization.header=true
 ```
 
-The default configuration is inside our project, but (before building) if you want to use a diffrent configuration (e.g enabling SSL certificates, or changing ports) you can paste in folder `/catalogue_qt_docker/docker-compose/build/files/server` another `application.properties` file, which will have higher priority and would override existing file in source codes and then you can build and run our docker.
 
-If you have already build container, and want to change Web Services configuration, you can do that without rebuilding docker!  
-All you need to do is to add `application.properties` file to this folder `docker-compose/volumes/server-properties`.   
-Then add this to your `docker-compose._deployment_name_.yml` in **server** section:
-```
-server:
-  volumes:
-    - ./volumes/server-properties:/home/imas/server-properties 
-```
-This line maps your `application.properties` on localhost to the file on container.    
-When the container is taken off, it will have the highest priority.
+#### Anatomy of `url.properties`
 
+This file consists of URLs that are avaiable in our API.   
+URLs that exists in this file and aren't commented or deleted are authenticated with tokens, only if keycloak is on.  
+If you have keycloak enabled (thus you can verify tokens) and you **comment/delete** some of the URLs you disable the token authorization of those deleted URLs.  
 
+`url_1=GET;/annotation;read` - this is the example url, which consists of:
+- one of `CRUD` methods: `GET`, `POST`, `PUT`, `DELETE` 
+- URL e.g.: `/annotation`
+- role permission: `read` or `write`
 
-
-After changing the settings, it may be necessary to restart from scratch:
+At default all of the URLS are enabled.
 
 ```
-> docker-compose rm
-> docker-compose up
+url_1=GET;/annotation;read
+url_2=GET;/annotation/get-by-experiment/*;read
+url_3=GET;/annotation/*;read
+url_4=POST;/annotation/add-by-experiment;write
+url_5=POST;/annotation;write
+url_6=PUT;/annotation/*;write
+url_7=DELETE;/annotation/*;write
+
+etc etc...
 ```
+
+#### Anatomy of `uri-mapping-feeder.properties` and `uri-mapping-parser.properties`
+
+This files are used to properly inject format of plasma data.  
+For now avaiable formats are: `UDA` and `MDSPLUS`.  
+
+You can add your own format as another plugin.
 
 ***
 ## Docker-compose Configuration
@@ -256,7 +307,7 @@ To do so open configutation file `docker-compose._deployment_name_.yml` and chan
 - The path where MySQL will store the data (default: `$(pwd)/db-data`)
 - The path where pulsefiles are stored on the host (default: `$(pwd)/imasdb`)
 - To map MySQL port to host port, so you can access the database from the container (by deafult no ports are exposed)
-- To add custom configuration of Web Services: `application.properties` file  
+- edit custom configuration of Web Services
 
 Additionally you can  create your own e.g `docker-compose.myconf.yml` and run it!
 ```
@@ -329,9 +380,9 @@ And then try to import data again.
 
 
 #### External experiment data folder
-If you mount data in folder that is inside `catalogue_qt_docker` the data can be lost if you delete repo.  
+If you mount data in folder that is inside `catalogue_qt_docker` the data can be lost if you delete `catalogue_qt_docker` folder.  
 To avoid this, you can have external folder with data outside repo, and mount to docker.  
-Thanks to it, you don't have to copy data everytime after downloading `catalogue_qt_docker`
+Thanks to it, you don't have to copy data everytime to `catalogue_qt_docker` after downloading. 
 
 ```
 .
@@ -339,9 +390,9 @@ Thanks to it, you don't have to copy data everytime after downloading `catalogue
 ├── experiment_data
 
 ```
-And then in your `docker-compose.api-<config_file>.yml` you can add:
-``` 
+And then in your `docker-compose.api-<config_file>.yml` you can add:  
 
+``` 
 services:
   server:
     volumes:
@@ -353,7 +404,7 @@ services:
 
 ### Adding persistent storage
 
-You can add persistent storage by setting it up inside `docker-compose.yml` file
+You can add persistent storage by setting it up inside `docker-compose.yml` file  
 
 ```
 services:
@@ -378,7 +429,7 @@ Our domain name for remote example machine installation is: **chara-47.man.pozna
 
 If you want to use it without authentication:
  - download, configure and build as said above
- - make sure you have opened 80 portto the ouside world on your host machine,
+ - make sure you have opened 80 port to the ouside world on your host machine,
 
 Otherwise, if you want to use is in secured mode, please do so:
 - set up SSL certificate
@@ -475,9 +526,9 @@ We need to copy 3 files:
 **Note!** Of course in your case the numbers in filenames would be diffrent so remember to change them!
 
 ```
-cp archive/domain-name/keystore.p12 ~/catalogue_qt_docker/docker-compose/volumes/cert
-cp archive/domain-name/cert3.pem ~/catalogue_qt_docker/docker-compose/volumes/cert
-cp archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes/cert
+cp archive/domain-name/keystore.p12 ~/catalogue_qt_docker/docker-compose/volumes/certs
+cp archive/domain-name/cert3.pem ~/catalogue_qt_docker/docker-compose/volumes/certs
+cp archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes/certs
 ```
 
 ## Reverse-Proxy SSL configuration with nginx 
@@ -575,7 +626,7 @@ or your LDAP account.
 You can debug either all the Java based components, inside Docker container, or you can specify which one should be started in debug more. For debugging Java code inside Docker containers we are using `JDWP` protocol, and by default we are using following ports
 
 ```
-Web Services   - 32889
+Catalog QT 2 (Web Serwices, Client etc)  - 32889
 Update process - 32888
 imas-watchdog  - 32887
 ```
@@ -611,7 +662,9 @@ If you want to develop Catalog QT 2 codes in a easy way with connection to conta
    a. top left corner -> click `+` `Add new configuration`   
    b. choose `Remote JVM Debug`  
    c. set settings as in a screen shot above (**Important!!** change port to **32889** or diffrent one set in `docker-compose.####.yml`    
-   d. run debug mode in IDE  
+   d. run debug mode in IDE with proper configuration  ![image](https://user-images.githubusercontent.com/34068433/156387692-e56aa5ac-46fd-415f-8d97-6cc7349c9e34.png)
+
+   
 7. In your konsole you will see that Spring is taken off!
 8. Go to your IDE and set breakpoint
 9. In Swagger or Postman send proper request on port 8080
@@ -619,6 +672,19 @@ If you want to develop Catalog QT 2 codes in a easy way with connection to conta
 
 **If this works - bravo!! You're ready to debug!**
 
+If you change some codes, you need to recompile the source codes.   
+To do so:
+
+```
+> cd ~/catalog_qt_2   #or whenever you have your mapped folder
+> ./clean.sh ; ./compile.sh  #this recompiles whole catalog_qt_2
+```
+
+Or if you want to recompile only changes in `catalog-ws-server` etc:
+
+`> .clean.sh ; ./compile_server.sh` 
+
+It takes few seconds, after that you need to rerun docker.
 
 ### Update process
 
@@ -657,10 +723,8 @@ To debug imas-watchdog you need to add following lines to `docker-compose.####.y
 -   Container `server` connects to `db`. The connection URL is in file: `catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties` in line:
 
     ```
-    spring.datasource.url=jdbc:mysql://localhost:3306/itm_catalog_qt?serverTimezone=UTC
+    spring.datasource.url=jdbc:mysql://db:3306/itm_catalog_qt?serverTimezone=UTC
     ```
-
-    This line is changed by `sed` in Dockerfile to correct value. If you want to change `db` container name in `docker-compose.yml`, then edit the Dockerfile and rebuild `catalogqt/server`.
 
 -   Container `updateprocess` connects to `server`. The connection URL is hard-coded in the main command `/updateprocess.sh` in the last lines:
 
