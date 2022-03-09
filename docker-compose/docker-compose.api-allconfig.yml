@@ -85,7 +85,7 @@ services:
       # ./clean.sh -> to get rid of cache
       # ./compile.sh -> to compile solution, changes are seen now
       # If changes aren't seen, please remove container and rerun  ./run.sh
-      # - /path/to/your/directory/catalog_qt_2/server/catalog-ws-server:/catalog_qt_2/server/catalog-ws-server 
+      # - /path/to/your/directory/catalog_qt_2:/catalog_qt_2
    
       
       # ports:       

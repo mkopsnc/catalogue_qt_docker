@@ -50,13 +50,6 @@ RUN useradd --create-home --shell /bin/bash imas && \
 
 FROM base AS server
 
-COPY files/server/*properties* /tmp/server/
-
-# RUN patch --follow-symlinks /catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties /tmp/server/application.properties.patch
-
-RUN if [ -e /tmp/server/application.properties ]; then cp /tmp/server/application.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi
-RUN if [ -e /tmp/server/url.properties ]; then cp /tmp/server/url.properties /catalog_qt_2/server/catalog-ws-server/src/main/resources/; fi
-
 RUN /tmp/compile-scripts/compile-server.sh /catalog_qt_2
 
 RUN mkdir /home/imas/server-properties

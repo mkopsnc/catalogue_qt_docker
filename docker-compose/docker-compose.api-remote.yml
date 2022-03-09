@@ -17,12 +17,12 @@ services:
       - 8443:8443
  
     environment:
-      - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
+      # - SPRING_CONFIG_LOCATION=file:///catalog_qt_2/server/catalog-ws-server/src/main/resources/application.properties 
       
     volumes:
       - ./volumes/imasdb:/home/imas/public/imasdb 
       - ./volumes/server-properties:/home/imas/server-properties
-      - ./volumes/certs:/home/imas/cert
+      - ./volumes/certs:/home/imas/certs
 
   updateprocess:
     image: catalogqt/updateprocess

@@ -158,8 +158,8 @@ It can be downloaded and used **seperaterly**, without docker.
 
 Catalog QT 2 has its own configuration files in `catalog_qt_2/server/catalog_ws_server/src/main/resources`: 
 
-- `application.properties  -> application.properties.noauth` (the arrow means it is softlinked **at default** to the `application.properties.noauth`,  
-       **Note!** this file is used **at default**!  )
+- `application.properties  -> application.properties.noauth` (the arrow means it is softlinked **at default** to the    
+      `application.properties.noauth`, **NOTE!** this file is used **at default**!  )
 - `application.properties.auth`
 - `application.properties.auth-cert`
 - `application.properties.noauth`
@@ -189,8 +189,7 @@ If you edit some of the files, all you need to do is to rerun docker. e.g:
 ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
 ```
 
-Thanks to this approach you don't have to edit config files inside  
-`docker-compose/build/catalog_qt_2/server/catalog_ws_server/src/main/resources` folder and rebuild whole docker, which takes a lot of time.   
+Thanks to this approach you don't have to edit config files inside `docker-compose/build/catalog_qt_2/server/catalog_ws_server/src/main/resources` folder and rebuild whole docker, which takes a lot of time.   
 Now this process is very fast and user friendly.
 
 
@@ -662,9 +661,7 @@ If you want to develop Catalog QT 2 codes in a easy way with connection to conta
    a. top left corner -> click `+` `Add new configuration`   
    b. choose `Remote JVM Debug`  
    c. set settings as in a screen shot above (**Important!!** change port to **32889** or diffrent one set in `docker-compose.####.yml`    
-   d. run debug mode in IDE with proper configuration  ![image](https://user-images.githubusercontent.com/34068433/156387692-e56aa5ac-46fd-415f-8d97-6cc7349c9e34.png)
-
-   
+   d. run debug mode in IDE with proper configuration  
 7. In your konsole you will see that Spring is taken off!
 8. Go to your IDE and set breakpoint
 9. In Swagger or Postman send proper request on port 8080
@@ -673,16 +670,14 @@ If you want to develop Catalog QT 2 codes in a easy way with connection to conta
 **If this works - bravo!! You're ready to debug!**
 
 If you change some codes, you need to recompile the source codes.   
-To do so:
+To do so 
 
 ```
-> cd ~/catalog_qt_2   #or whenever you have your mapped folder
-> ./clean.sh ; ./compile.sh  #this recompiles whole catalog_qt_2
+cd ~/catalog_qt_2   #or whenever you have your mapped folder
+
+./clean.sh ; ./compile_server.sh
+
 ```
-
-Or if you want to recompile only changes in `catalog-ws-server` etc:
-
-`> .clean.sh ; ./compile_server.sh` 
 
 It takes few seconds, after that you need to rerun docker.
 
