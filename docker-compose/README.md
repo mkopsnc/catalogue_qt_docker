@@ -489,7 +489,7 @@ The output file `keystore.p12` is the file that has all the required informati
 In `application.properties` enter this information:
 
 ```
-server.ssl.key-store="path to your keystore.p12 file"
+server.ssl.key-store=/home/imas/certs   
 server.ssl.key-store-password="password to keystore.p12 file"
 ```
 
@@ -524,10 +524,23 @@ We need to copy 3 files:
 
 **Note!** Of course in your case the numbers in filenames would be diffrent so remember to change them!
 
+``` 
+> pwd 
+/etc/letstencrypt/your_domain_name/
+
+> cp keystore.p12 ~/catalogue_qt_docker/docker-compose/volumes/certs
+> cp ../../archive/domain-name/cert3.pem ~/catalogue_qt_docker/docker-compose/volumes/certs
+> cp ../../archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes/certs
 ```
-cp archive/domain-name/keystore.p12 ~/catalogue_qt_docker/docker-compose/volumes/certs
-cp archive/domain-name/cert3.pem ~/catalogue_qt_docker/docker-compose/volumes/certs
-cp archive/domain-name/privkey3.pem ~/catalogue_qt_docker/docker-compose/volumes/certs
+
+Check if copying finished successfully
+```
+> cd ~/catalogue_qt_docker/docker-compose/volumes/certs
+> ls -1
+
+keystore.p12
+cert3.pem
+privkey3.pem
 ```
 
 ## Reverse-Proxy SSL configuration with nginx 
