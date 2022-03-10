@@ -39,7 +39,7 @@ swagger-ui.authorization.header.enabled=true
 
 # --------- HTTPS certificate settings  -----------
 
-server.ssl.key-store=file:///home/imas/cert/keystore.p12
+server.ssl.key-store=file:///home/imas/certs/keystore.p12
 server.ssl.key-store-password=catalogqt
 server.ssl.keyStoreType=PKCS12
 server.ssl.keyAlias=tomcat
