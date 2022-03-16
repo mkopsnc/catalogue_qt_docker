@@ -51,7 +51,7 @@ Docker image that contains Dashboard application can be downloaded from a Docker
 Before you proceed, make sure you can access the registry. You can test it by executing following command
 
 ```
-> docker login registry.apps.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
+> docker login rhus-71.man.poznan.pl/f4f/dashboard-ui/assets:branch-develop
 ```
 
 
