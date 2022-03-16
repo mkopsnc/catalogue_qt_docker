@@ -135,8 +135,8 @@ The most basic execution of our Catalog QT 2 on local machine is:
 
 To access our application please paste this urls in your browser:
 
-http://localhost/api/swagger-ui.html#/ to access Web Services via Swagger based UI.  
-http://localhost/dashboard/ to access User-friendly Interface
+- [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
+- [http://localhost:9100/dashboard/](http://localhost:9100/dashboard/) to access User-friendly Interface
 
 ***
 # Configuration
@@ -324,8 +324,9 @@ Catalog QT Demonstrator allows to import MDSPlus based data automatically into S
 First of all, make sure you have `MDSPlus` like directory structure with pulse files. The easiest way to execute Docker container with sample data is to get sample data from `box.psnc.pl` - these are completely artificially created data prepared by testing framework.
 
 ```
-> curl -s -o f4f_data.tar.gz \
-    https://box.psnc.pl/seafhttp/files/01953e73-8ad3-4277-be71-57b69c395355/f4f_data.tar.gz
+> curl -L -s \
+    -o f4f_data.tar.gz \
+    "https://box.psnc.pl/f/a0e76d1063/?raw=1"
 ```
 
 Make sure your directories structure looks like this
@@ -385,8 +386,8 @@ Thanks to it, you don't have to copy data everytime to `catalogue_qt_docker` aft
 
 ```
 .
-├── catalogue_qt_docker
-├── experiment_data
+|-- catalogue_qt_docker
+`-- experiment_data
 
 ```
 And then in your `docker-compose.api-<config_file>.yml` you can add:  
