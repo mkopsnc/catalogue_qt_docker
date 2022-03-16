@@ -29,8 +29,8 @@ The easiest, fastest way to get it running follows:
 > ./run.sh -s api-noauth -s ui-noauth -s proxy-noauth
 ```
 
-- [http://localhost/api/swagger-ui.html#/](http://localhost/api/swagger-ui.html#/) to access Web Services via Swagger based UI.
-- [http://localhost/dashboard/](http://localhost/dashboard/) to access User-friendly Interface
+- [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) to access Web Services via Swagger based UI.
+- [http://localhost:9100/dashboard/](http://localhost:9100/dashboard/) to access User-friendly Interface
 
 ***
 
