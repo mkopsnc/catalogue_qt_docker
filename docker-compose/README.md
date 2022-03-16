@@ -61,7 +61,7 @@ You will also need an access to `catalog_qt_2` project. Make sure you can access
 To do so, please go to folder `docker-compose/build` and in there execute this command:
 
 ```
-> git clone --single-branch develop https://YOUR_USER_NAME@gforge6.eufus.eu/git/catalog_qt_2 
+> git clone --single-branch --branch=develop https://YOUR_USER_NAME@gforge-next.eufus.eu/git/catalog_qt_2 
 ```
 
 You will be asked for a user name and password. If you don't have it, contact developer of this project.
@@ -73,7 +73,7 @@ You will be asked for a user name and password. If you don't have it, contact de
 This repository is publicly available. All you have to do, is to double check whether you can clone it in `docker-compose/build` folder.
 
 ```
-> git clone --single-branch master https://github.com/tzok/imas-watchdog.git
+> git clone --single-branch --branch=master https://github.com/tzok/imas-watchdog.git
 ```
 
 ## Make sure you have proper `/etc/hosts/`
