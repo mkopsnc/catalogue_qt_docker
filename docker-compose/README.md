@@ -66,7 +66,18 @@ To do so, please go to folder `docker-compose/build` and in there execute this c
 
 You will be asked for a user name and password. If you don't have it, contact developer of this project.
 
+### Getting Catalog QT 2 without having Gateway access
 
+Alternatively, you can get `Catalog QT 2` from the mirror: [dashboard-ui-catalog-qt-2](https://gitlab.com/fair-for-fusion/dashboard-ui-catalog-qt-2)
+
+Make sure to create a clone of this repository inside `docker-compose/build` directory
+
+```
+> cd catalogue_qt_docker/docker-compose/build
+> git clone https://gitlab.com/fair-for-fusion/dashboard-ui-catalog-qt-2 catalog_qt_2
+```
+
+Once this directory is there, build process will not try to download source code from the `Gateway`.
 
 ### Make sure you can access imas-watchdog project
 
