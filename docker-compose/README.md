@@ -735,6 +735,70 @@ To debug imas-watchdog you need to add following lines to `docker-compose.####.y
       - DEBUG_IMAS_WATCHDOG=true
 ```
 
+# Debugging MariaDB server
+
+## Using MariaDB client
+
+If you want to analyze the raw content of database, it's possible. You can run queries directly inside `MariaDB` client by running following commands
+
+```
+> docker exec -it docker-compose_db_1 /bin/bash
+root@97cf2fc02923:/# mysql -u itm_catalog_rw -p itm_catalog_qt
+Enter password: itm_catalog_rw
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 14
+Server version: 10.7.3-MariaDB-1:10.7.3+maria~focal mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [itm_catalog_qt]> show tables;
++--------------------------+
+| Tables_in_itm_catalog_qt |
++--------------------------+
+| annotation               |
+| catalog_parameters       |
+| entry                    |
+| entry_data               |
+| entry_replacement        |
+| experiment               |
+| filter                   |
+| outcome                  |
+| reference                |
+| request                  |
+| request_status           |
+| tag                      |
+| tag_entry                |
+| user                     |
+| user_filter              |
+| variable                 |
+| variable_type            |
++--------------------------+
+17 rows in set (0.000 sec)
+
+MariaDB [itm_catalog_qt]>
+```
+You can now run `SQL` queries directly inside `MariaDB` client application.
+
+## Using external SQL client
+
+If you want to connect to `MariaDB` from external client (e.g.: `DataGrip`) you can do that by exposing port `3306` inside `docker-compose.yaml`.
+
+```
+services:
+  db:
+    image: catalogqt/db
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+    ports:
+      - 3306:3306
+```
+
+Once service is up and running you can connect to `localhost:3306`. If you are running service on some other domain, you can use domain of your choice instead.
 
 # Container dependencies
 
